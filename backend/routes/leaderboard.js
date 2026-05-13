@@ -5,7 +5,7 @@ import { io } from "../server.js";
 
 const router = express.Router();
 
-// 🏆 Public (optional)
+// Public
 router.get("/", async (req, res) => {
   const users = await User.find()
     .sort({ score: -1 })
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
   res.json(users);
 });
 
-// 🔐 Protected → Update score
+//Protected Update score
 router.post("/update-score", authMiddleware, async (req, res) => {
   try {
     const { points } = req.body;
@@ -25,13 +25,13 @@ router.post("/update-score", authMiddleware, async (req, res) => {
       $inc: { score: points }
     });
 
-    // 🔥 Get updated leaderboard
+    // Get updated leaderboard
     const users = await User.find()
       .sort({ score: -1 })
       .limit(10)
       .select("name score");
 
-    // ⚡ Emit update
+    // Emit update
     io.emit("leaderboardUpdate", users);
 
     res.json({ msg: "Score updated" });
