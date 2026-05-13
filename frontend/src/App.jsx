@@ -1,103 +1,117 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import CodeReview from "./pages/CodeReview";
-import Modules from "./pages/Modules";
-import Topics from "./pages/Topics";
-import Quiz from "./pages/Quiz";
-import Login from "./pages/Login";
-import PrepPlanner from "./pages/PrepPlanner";
-import Home from "./pages/Home";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+import {
+  Suspense,
+  lazy,
+  useEffect,
+} from "react";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import { useState, useEffect } from "react";
+import Loader from "./components/ui/Loader";
 
+import { useAuthStore } from "./store/authStore";
+
+// ================= LAZY PAGES =================
+const Home = lazy(() => import("./pages/Home"));
+
+const Login = lazy(() => import("./pages/Login"));
+
+const Dashboard = lazy(() =>
+  import("./pages/Dashboard")
+);
+
+const CodeReview = lazy(() =>
+  import("./pages/CodeReview")
+);
+
+const Modules = lazy(() =>
+  import("./pages/Modules")
+);
+
+const Topics = lazy(() =>
+  import("./pages/Topics")
+);
+
+const Quiz = lazy(() =>
+  import("./pages/Quiz")
+);
+
+const PrepPlanner = lazy(() =>
+  import("./pages/PrepPlanner")
+);
+
+// ================= APP =================
 function App() {
-  const [streak, setStreak] = useState(() => {
-    return Number(localStorage.getItem("streak")) || 0;
-  });
 
-  const [xp, setXp] = useState(() => {
-    return Number(localStorage.getItem("xp")) || 0;
-  });
+  const { checkAuth } = useAuthStore();
 
-  const [level, setLevel] = useState(() => {
-    return Number(localStorage.getItem("level")) || 1;
-  });
-
-  const calculateLevel = (xp) => {
-    return Math.floor(xp / 100) + 1;
-  };
-
+  // Check auth on app load
   useEffect(() => {
-    localStorage.setItem("xp", xp);
-    localStorage.setItem("level", level);
-  }, [xp, level]);
-
-  useEffect(() => {
-    localStorage.setItem("streak", streak);
-  }, [streak]);
+    checkAuth();
+  }, []);
 
   return (
     <BrowserRouter>
-      <Routes>
-        {/* 🔐 PUBLIC ROUTES */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/prep-planner" element={<PrepPlanner />} />
 
-        {/* 🔐 PROTECTED ROUTES */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard xp={xp} level={level} />
-            </ProtectedRoute>
-          }
-        />
+      <Suspense fallback={<Loader />}>
 
-        <Route
-          path="/code"
-          element={
-            <ProtectedRoute>
-              <CodeReview
-                xp={xp}
-                level={level}
-                setXp={setXp}
-                setLevel={setLevel}
-                calculateLevel={calculateLevel}
-                setStreak={setStreak}
-              />
-            </ProtectedRoute>
-          }
-        />
+        <Routes>
 
-        <Route
-          path="/modules"
-          element={
-            <ProtectedRoute>
-              <Modules />
-            </ProtectedRoute>
-          }
-        />
+          {/* Public Routes */}
+          <Route
+            path="/"
+            element={<Home />}
+          />
 
-        <Route
-          path="/topics"
-          element={
-            <ProtectedRoute>
-              <Topics />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/login"
+            element={<Login />}
+          />
 
-        <Route
-          path="/quiz"
-          element={
-            <ProtectedRoute>
-              <Quiz setXp={setXp} />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          <Route
+            path="/prep-planner"
+            element={<PrepPlanner />}
+          />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+
+            <Route
+              path="/dashboard"
+              element={<Dashboard />}
+            />
+
+            <Route
+              path="/code"
+              element={<CodeReview />}
+            />
+
+            <Route
+              path="/modules"
+              element={<Modules />}
+            />
+
+            <Route
+              path="/topics"
+              element={<Topics />}
+            />
+
+            <Route
+              path="/quiz"
+              element={<Quiz />}
+            />
+
+          </Route>
+
+        </Routes>
+
+      </Suspense>
+
     </BrowserRouter>
   );
 }

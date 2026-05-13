@@ -1,56 +1,28 @@
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
-
-import { createServer } from "http";
-import { Server } from "socket.io";
-
-import authRoutes from "./routes/auth.js";
-import leaderboardRoutes from "./routes/leaderboard.js";
-
 dotenv.config();
 
-const app = express();
+import { createServer } from "http";
+
+import app from "./app.js";
+import connectDB from "./config/db.js";
+import { initSocket } from "./socket/socket.js";
+
 const PORT = process.env.PORT || 5000;
 
-// 🔌 Middlewares
-app.use(cors({
-  origin: "*", // later replace with your frontend URL
-}));
-app.use(express.json());
+const startServer = async () => {
+  try {
+    await connectDB();
 
-// 🔗 Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/leaderboard", leaderboardRoutes);
+    const server = createServer(app);
 
-// 🌐 Create HTTP server
-const server = createServer(app);
-
-// ⚡ Socket.IO setup
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
-});
-
-// 🔥 Export io
-export { io };
-
-// 🧪 Test route (optional but useful)
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
-});
-
-// 🧠 DB + Server start
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
+    initSocket(server);
 
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.log("MongoDB error:", err);
-  });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+startServer();

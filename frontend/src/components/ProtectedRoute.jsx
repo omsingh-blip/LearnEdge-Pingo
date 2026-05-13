@@ -1,11 +1,31 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
-export default function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("token");
+import { useAuthStore } from "../store/authStore";
 
-  if (!token) {
-    return <Navigate to="/" />;
+import Loader from "./ui/Loader";
+
+export default function ProtectedRoute() {
+
+  const {
+    isAuthenticated,
+    checkingAuth,
+  } = useAuthStore();
+
+  // Show loader while checking auth
+  if (checkingAuth) {
+    return <Loader />;
   }
 
-  return children;
+  // Not authenticated
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  // Authorized
+  return <Outlet />;
 }
