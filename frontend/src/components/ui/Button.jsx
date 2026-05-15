@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 export default function Button({
   children,
   onClick,
@@ -6,22 +8,28 @@ export default function Button({
   className = "",
 }) {
   return (
-    <button
+    <motion.button
       type={type}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       disabled={disabled}
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
       className={`
         group relative w-full py-3 rounded-lg
-        bg-blue-600
+        bg-gray-900/80 backdrop-blur-lg border border-gray-700
+        text-white font-medium text-center
         transition-all duration-300
-        hover:scale-[1.02]
-        disabled:opacity-50
+        hover:bg-gray-700/80
+        hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]
+        disabled:bg-gray-700/50
+        disabled:text-gray-400
         disabled:cursor-not-allowed
+        disabled:hover:bg-gray-700/50
+        disabled:hover:shadow-none
         overflow-hidden
         ${className}
       `}
     >
-
       {/* Glow */}
       <span
         className="absolute inset-0 rounded-lg bg-green-400 opacity-0
@@ -29,10 +37,7 @@ export default function Button({
       ></span>
 
       {/* Content */}
-      <span className="relative z-10">
-        {children}
-      </span>
-
-    </button>
+      <span className="relative z-10">{children}</span>
+    </motion.button>
   );
 }

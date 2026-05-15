@@ -13,13 +13,13 @@ export default function PingoAssistant({ xp }) {
     let message = "";
 
     if (xp === 0) {
-      message = "👋 Start your journey!";
+      message = "  Start your journey!";
     } else if (xp < 50) {
-      message = "🔥 Good start! Try quiz!";
+      message = "  Good start! Try quiz!";
     } else if (xp < 100) {
-      message = "🚀 You're improving fast!";
+      message = "   You're improving fast!";
     } else {
-      message = "🏆 You're on fire!";
+      message = " You're on fire!";
     }
 
     setPingoMessage(message);

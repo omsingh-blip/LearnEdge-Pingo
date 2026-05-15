@@ -2,6 +2,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  useLocation,
 } from "react-router-dom";
 
 import {
@@ -10,16 +11,26 @@ import {
   useEffect,
 } from "react";
 
+import {
+  AnimatePresence,
+} from "framer-motion";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Loader from "./components/ui/Loader";
 
+import PageWrapper from "./components/layout/PageWrapper";
+
 import { useAuthStore } from "./store/authStore";
 
 // ================= LAZY PAGES =================
-const Home = lazy(() => import("./pages/Home"));
+const Home = lazy(() =>
+  import("./pages/Home")
+);
 
-const Login = lazy(() => import("./pages/Login"));
+const Login = lazy(() =>
+  import("./pages/Login")
+);
 
 const Dashboard = lazy(() =>
   import("./pages/Dashboard")
@@ -45,65 +56,103 @@ const PrepPlanner = lazy(() =>
   import("./pages/PrepPlanner")
 );
 
-// ================= APP =================
-function App() {
+const Practice = lazy(() =>
+  import("./pages/Practice")
+);
+// ================= ROUTES =================
+function AnimatedRoutes() {
 
-  const { checkAuth } = useAuthStore();
-
-  // Check auth on app load
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const location =
+    useLocation();
 
   return (
-    <BrowserRouter>
+    <AnimatePresence mode="wait">
 
       <Suspense fallback={<Loader />}>
 
-        <Routes>
+        <Routes
+          location={location}
+          key={location.pathname}
+        >
 
-          {/* Public Routes */}
+          {/* Public */}
           <Route
             path="/"
-            element={<Home />}
+            element={
+              <PageWrapper>
+                <Home />
+              </PageWrapper>
+            }
           />
 
           <Route
             path="/login"
-            element={<Login />}
+            element={
+              <PageWrapper>
+                <Login />
+              </PageWrapper>
+            }
           />
 
           <Route
             path="/prep-planner"
-            element={<PrepPlanner />}
+            element={
+              <PageWrapper>
+                <PrepPlanner />
+              </PageWrapper>
+            }
           />
 
-          {/* Protected Routes */}
+          {/* Protected */}
           <Route element={<ProtectedRoute />}>
 
             <Route
               path="/dashboard"
-              element={<Dashboard />}
+              element={
+                <PageWrapper>
+                  <Dashboard />
+                </PageWrapper>
+              }
             />
 
+            <Route
+              path="/practice"
+              element={<Practice />}
+            />
             <Route
               path="/code"
-              element={<CodeReview />}
+              element={
+                <PageWrapper>
+                  <CodeReview />
+                </PageWrapper>
+              }
             />
 
             <Route
-              path="/modules"
-              element={<Modules />}
+             path="/modules/:domain"
+              element={
+                <PageWrapper>
+                  <Modules />
+                </PageWrapper>
+              }
             />
 
             <Route
               path="/topics"
-              element={<Topics />}
+              element={
+                <PageWrapper>
+                  <Topics />
+                </PageWrapper>
+              }
             />
 
             <Route
               path="/quiz"
-              element={<Quiz />}
+              element={
+                <PageWrapper>
+                  <Quiz />
+                </PageWrapper>
+              }
             />
 
           </Route>
@@ -111,6 +160,25 @@ function App() {
         </Routes>
 
       </Suspense>
+
+    </AnimatePresence>
+  );
+}
+
+// ================= APP =================
+function App() {
+
+  const { checkAuth } =
+    useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  return (
+    <BrowserRouter>
+
+      <AnimatedRoutes />
 
     </BrowserRouter>
   );

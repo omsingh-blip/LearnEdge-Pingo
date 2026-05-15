@@ -85,20 +85,6 @@ export default function Home() {
         <div className="flex gap-6">
 
           <button
-            onClick={() => navigate("/prep-planner")}
-            className="group relative px-7 py-3 rounded-lg bg-blue-500 
-            transition-all duration-300
-            hover:scale-110"
-          >
-            <span className="absolute inset-0 rounded-lg bg-green-400 opacity-0 
-            group-hover:opacity-20 blur-xl transition"></span>
-
-            <span className="relative z-10">
-              ⚡ Day Prep Planner
-            </span>
-          </button>
-
-          <button
             onClick={() => navigate("/login")}
             className="group relative px-7 py-3 rounded-lg bg-slate-800 border border-slate-600
             transition-all duration-300

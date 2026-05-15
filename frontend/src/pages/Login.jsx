@@ -59,28 +59,36 @@ export default function Login() {
     }
 
     // SIGNUP
-    if (isSignup) {
-      const res = await signup(name, email, password);
+   if (isSignup) {
 
-      if (res.success) {
+  const res =
+    await signup(
+      name,
+      email,
+      password
+    );
 
-        toast.success("Account created successfully");
+  if (res.success) {
 
-        setIsSignup(false);
+    toast.success(
+      "Account created successfully"
+    );
 
-        setFormData({
-          name: "",
-          email,
-          password: "",
-        });
+    setIsSignup(false);
 
-      } else {
-        toast.error(res.message);
-      }
+    setFormData({
+      name: "",
+      email,
+      password: "",
+    });
 
-      return;
-    }
+    return;
+  }
 
+  toast.error(res.message);
+
+  return;
+}
     // LOGIN
     const res = await login(email, password);
 

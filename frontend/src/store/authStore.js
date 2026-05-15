@@ -68,7 +68,7 @@ export const useAuthStore = create((set) => ({
                 password
             );
 
-            const { token, user } = res.data;
+            const { token, user } = res;
 
             saveAuth(token, user);
 
@@ -108,58 +108,50 @@ export const useAuthStore = create((set) => ({
 
     },
 
-    // ================= SIGNUP =================
-    signup: async (
-        name,
-        email,
-        password
-    ) => {
+   // ================= SIGNUP =================
+signup: async (
+    name,
+    email,
+    password
+) => {
+
+    set({
+        loading: true,
+    });
+
+    try {
+
+        await signupUser(
+            name,
+            email,
+            password
+        );
 
         set({
-            loading: true,
+            loading: false,
         });
 
-        try {
+        return {
+            success: true,
+        };
 
-            await signupUser(
-                name,
-                email,
-                password
-            ); await api.post(
-                "/auth/register",
-                {
-                    name,
-                    email,
-                    password,
-                }
-            );
+    } catch (error) {
 
-            set({
-                loading: false,
-            });
+        set({
+            loading: false,
+        });
 
-            return {
-                success: true,
-            };
+        return {
+            success: false,
 
-        } catch (error) {
+            message:
+                error.response?.data?.msg ||
+                "Signup failed",
+        };
 
-            set({
-                loading: false,
-            });
+    }
 
-            return {
-                success: false,
-
-                message:
-                    error.response?.data?.msg ||
-                    "Signup failed",
-            };
-
-        }
-
-    },
-
+},
     // ================= LOGOUT =================
     logout: () => {
 
@@ -196,7 +188,7 @@ export const useAuthStore = create((set) => ({
 
             set({
                 token,
-                user: res.data.user,
+                user: res.user,
                 isAuthenticated: true,
                 checkingAuth: false,
             });

@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 
+html,
+body,
+#root {
+  overflow-x: hidden;
+  background: #0f172a;
+}
+
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -19,7 +27,7 @@
 }
 
 
-/* 🫁 Breathing animation */
+/* Breathing animation */
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
@@ -29,7 +37,7 @@
   animation: breathe 3s ease-in-out infinite;
 }
 
-/* 🎞️ Horizontal scroll */
+/* Horizontal scroll */
 @keyframes scrollX {
   0% {
     transform: translateX(0);
@@ -223,4 +231,37 @@
 
 .card-shine:hover::before {
   opacity: 1;
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.35);
+
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.5);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(59, 130, 246, 0.35)
+    rgba(15, 23, 42, 0.95);
 }

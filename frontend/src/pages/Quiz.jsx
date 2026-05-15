@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
+import { useGameStore } from "../store/useGameStore";
 
-export default function Quiz({ setXp }) {
+export default function Quiz() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { addXP, xp } =
+  useGameStore();
 
   const quiz = location.state?.quiz || [];
 
@@ -68,16 +72,20 @@ export default function Quiz({ setXp }) {
 
   useEffect(() => {
     if (showResult && quiz.length > 0) {
-      setXp((prev) => {
-        const newXp = prev + earnedXP;
+      addXP(earnedXP);
 
-        if (Math.floor(prev / 100) < Math.floor(newXp / 100)) {
-          setLevelUp(true);
-          setTimeout(() => setLevelUp(false), 3000);
-        }
+if (
+  Math.floor(xp / 100) <
+  Math.floor((xp + earnedXP) / 100)
+) {
 
-        return newXp;
-      });
+  setLevelUp(true);
+
+  setTimeout(() => {
+    setLevelUp(false);
+  }, 3000);
+
+}
 
       updateScoreBackend(earnedXP);
     }
