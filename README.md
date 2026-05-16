@@ -1,4 +1,4 @@
-# 🚀 PingO AI
+# PingO AI
 
 An AI-powered learning and interview preparation platform designed to make learning interactive, intelligent, and gamified.
 
