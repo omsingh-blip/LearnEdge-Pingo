@@ -1,18 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import Editor from "@monaco-editor/react";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
-
 import Card from "../components/ui/Card";
-
 import Button from "../components/ui/Button";
-
-import { useGameStore } from "../store/useGameStore";
 
 export default function Practice() {
 
-  const { addXP } = useGameStore();
+  const location =
+    useLocation();
 
   const [language, setLanguage] =
     useState("javascript");
@@ -22,8 +20,6 @@ export default function Practice() {
       `console.log("Hello LearnEdge");`
     );
 
-  const [problem, setProblem] =
-    useState("");
 
   const [loading, setLoading] =
     useState(false);
@@ -31,436 +27,764 @@ export default function Practice() {
   const [review, setReview] =
     useState(null);
 
+  const question =
+    location.state?.question;
+
+  const [problem, setProblem] =
+    useState(
+      question?.title || ""
+    );
+
+  const [showQuestionInfo,
+    setShowQuestionInfo] =
+    useState(
+      !!question
+    );
+
   const [output, setOutput] =
     useState("");
 
   const [running, setRunning] =
     useState(false);
 
-  // ================= REVIEW =================
-  const handleReview = async () => {
 
-    if (!code.trim()) return;
+  useEffect(() => {
 
-    setLoading(true);
+    if (question) {
 
-    setTimeout(() => {
-
-      const fakeReview = {
-
-        status: "Good",
-
-        explanation:
-          "Your logic is clean and readable.",
-
-        suggestion:
-          "Try optimizing time complexity further.",
-
-        earnedXP: 15,
-
-      };
-
-      setReview(fakeReview);
-
-      addXP(fakeReview.earnedXP);
-
-      setLoading(false);
-
-    }, 1500);
-
-  };
-
-  // ================= RUN CODE =================
-const handleRunCode = async () => {
-
-  setRunning(true);
-
-  setOutput("Running code...");
-
-  try {
-
-    if (
-      language !== "javascript"
-    ) {
-
-      setOutput(
-        "⚠️ Currently only JavaScript execution is supported locally."
+      setProblem(
+        question.title
       );
 
-      setRunning(false);
+      setShowQuestionInfo(
+        true
+      );
 
-      return;
+      setReview(
+        null
+      );
+
     }
 
-    let logs = [];
+  }, [question]);
+  // ================= REVIEW =================
 
-    const originalLog =
-      console.log;
+  const handleReview =
+    async () => {
 
-    console.log = (...args) => {
+      if (!code.trim())
+        return;
 
-      logs.push(
-        args.join(" ")
+      try {
+
+        setLoading(true);
+
+        setShowQuestionInfo(false);
+
+        const token =
+          localStorage.getItem(
+            "token"
+          );
+
+        const res =
+          await fetch(
+            "http://localhost:5000/api/reviews",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                Authorization:
+                  `Bearer ${token}`
+              },
+
+              body:
+                JSON.stringify({
+
+                  problem,
+                  language,
+                  code
+
+                })
+            }
+          );
+
+        const data =
+          await res.json();
+
+        if (
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message
+          );
+
+        }
+
+        setReview(
+          data.review
+        );
+
+      }
+
+      catch (error) {
+
+        console.log(
+          error
+        );
+
+        setOutput(
+          "❌ Review Failed"
+        );
+
+        setShowQuestionInfo(
+          true
+        );
+      }
+
+      finally {
+
+        setLoading(
+          false
+        );
+
+      }
+
+    };
+
+
+  // ================= RUN =================
+
+const handleRunCode=
+async()=>{
+
+try{
+
+setRunning(true);
+
+setOutput(
+"Running..."
+);
+
+const res=
+await fetch(
+
+"http://localhost:5000/api/compiler/run",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+body:
+JSON.stringify({
+
+code,
+language
+
+})
+
+}
+
+);
+
+const data=
+await res.json();
+
+setOutput(
+data.output
+);
+
+}
+
+catch{
+
+setOutput(
+"❌ Execution failed"
+);
+
+}
+
+finally{
+
+setRunning(false);
+
+}
+
+};
+
+  const renderList =
+    (title, items) => {
+
+      if (
+        !items ||
+        !items.length
+      )
+        return null;
+
+      return (
+
+        <div>
+
+          <p
+            className="
+text-gray-400
+mb-2
+"
+          >
+
+            {title}
+
+          </p>
+
+          <div
+            className="
+p-4
+rounded-xl
+
+bg-slate-800
+
+border
+border-slate-700
+"
+          >
+
+            <ul
+              className="
+list-disc
+ml-5
+space-y-2
+"
+            >
+
+              {
+
+                items.map(
+                  (item, i) => (
+
+                    <li
+                      key={i}
+                    >
+
+                      {item}
+
+                    </li>
+
+                  )
+                )
+
+              }
+
+            </ul>
+
+          </div>
+
+        </div>
+
       );
 
     };
 
-    // Execute user code
-    eval(code);
-
-    console.log =
-      originalLog;
-
-    setOutput(
-
-      logs.length
-        ? logs.join("\n")
-        : "✅ Code executed successfully."
-
-    );
-
-  } catch (error) {
-
-    setOutput(
-      "❌ " + error.message
-    );
-
-  }
-
-  setRunning(false);
-
-};
-
   return (
+
     <DashboardLayout>
 
       <div
         className="
-          max-w-7xl mx-auto
-          grid grid-cols-1 lg:grid-cols-2
-          gap-6
-        "
+max-w-7xl
+mx-auto
+
+grid
+grid-cols-1
+lg:grid-cols-2
+
+gap-6
+"
       >
 
-        {/* LEFT PANEL */}
+        {/* LEFT */}
+
         <Card
           className="
-            p-5
-            bg-slate-900/60
-            backdrop-blur-xl
-          "
+p-5
+bg-slate-900/60
+backdrop-blur-xl
+"
         >
 
-          {/* Header */}
-          <div
+          <h1
             className="
-              flex flex-col md:flex-row
-              md:items-center
-              md:justify-between
-              gap-4 mb-5
-            "
+text-2xl
+font-bold
+mb-5
+"
           >
 
-            <div>
+            Coding Practice
 
-              <h1
-                className="
-                  text-2xl font-bold
-                  mb-1
-                "
-              >
-                Coding Practice
-              </h1>
+          </h1>
 
-              <p className="text-gray-400 text-sm">
-                Practice problems and get AI feedback
-              </p>
-
-            </div>
-
-            {/* Language */}
-            <select
-              value={language}
-
-              onChange={(e) =>
-                setLanguage(
-                  e.target.value
-                )
-              }
-
-              className="
-                bg-slate-800
-                border border-slate-700
-                px-4 py-2 rounded-xl
-                outline-none
-              "
-            >
-
-              <option value="javascript">
-                JavaScript
-              </option>
-
-              <option value="cpp">
-                C++
-              </option>
-
-              <option value="python">
-                Python
-              </option>
-
-              <option value="java">
-                Java
-              </option>
-
-            </select>
-
-          </div>
-
-          {/* Problem */}
           <input
-            type="text"
-
-            placeholder="Problem title..."
 
             value={problem}
 
+            onChange={
+              (e) =>
+                setProblem(
+                  e.target.value
+                )
+            }
+
+            placeholder=
+            "Problem title..."
+
+            className="
+w-full
+mb-4
+p-3
+
+rounded-xl
+
+bg-slate-800
+
+border
+border-slate-700
+"
+          />
+
+          <select
+            value={language}
             onChange={(e) =>
-              setProblem(
+              setLanguage(
                 e.target.value
               )
             }
 
             className="
-              w-full mb-4
-              p-3 rounded-xl
-              bg-slate-800
-              border border-slate-700
-              outline-none
-            "
+    mb-4
+    p-2
+
+    rounded-xl
+
+    bg-slate-800
+
+    border
+    border-slate-700
+  "
+          >
+
+            <option value="javascript">
+              JavaScript
+            </option>
+
+            <option value="python">
+              Python
+            </option>
+
+            <option value="cpp">
+              C++
+            </option>
+
+            <option value="java">
+              Java
+            </option>
+
+          </select>
+
+          <Editor
+
+            height="500px"
+
+            theme="vs-dark"
+
+            language={language}
+
+            value={code}
+
+            onChange={
+              (v) =>
+                setCode(
+                  v || ""
+                )
+            }
+
           />
 
-          {/* Editor */}
           <div
             className="
-              rounded-xl overflow-hidden
-              border border-slate-700
-            "
+mt-5
+flex
+gap-4
+"
           >
 
-            <Editor
-              height="500px"
-
-              theme="vs-dark"
-
-              language={language}
-
-              value={code}
-
-              onChange={(value) =>
-                setCode(value || "")
+            <Button
+              onClick={
+                handleRunCode
               }
-            />
-
-          </div>
-
-          {/* Actions */}
-          <div
-            className="
-              mt-5 flex flex-col sm:flex-row
-              gap-4
-            "
-          >
-
-            <Button
-              onClick={handleRunCode}
-
-              disabled={running}
             >
 
-              {running
-                ? "Running..."
-                : "Run Code"}
+              {running ?
+
+                "Running..."
+
+                :
+
+                "Run Code"
+
+              }
 
             </Button>
 
             <Button
-              onClick={handleReview}
-
-              disabled={loading}
+              onClick={
+                handleReview
+              }
             >
 
-              {loading
-                ? "Reviewing..."
-                : "Review Code"}
+              {loading ?
+
+                "Reviewing..."
+
+                :
+
+                "Review Code"
+
+              }
 
             </Button>
 
           </div>
 
-          {/* Output Console */}
           <div
             className="
-              mt-5 rounded-2xl
-              border border-slate-700
-              overflow-hidden
-            "
+mt-5
+p-4
+
+rounded-xl
+
+bg-black/40
+
+border
+border-slate-700
+
+text-green-400
+
+font-mono
+"
           >
 
-            <div
-              className="
-                bg-slate-800
-                px-4 py-2
-                border-b border-slate-700
-                text-sm text-gray-300
-                font-medium
-              "
-            >
-              Output
-            </div>
+            {
+              output ||
 
-            <div
-              className="
-                bg-black/40
-                min-h-[140px]
-                p-4
-                text-sm
-                font-mono
-                whitespace-pre-wrap
-                text-green-400
-              "
-            >
-              {output ||
-                "Run your code to see output..."}
-            </div>
+              "Run your code..."
+            }
 
           </div>
 
         </Card>
+
 
         {/* RIGHT PANEL */}
+
         <Card
           className="
-            p-5
-            bg-slate-900/60
-            backdrop-blur-xl
-            min-h-[700px]
-          "
+p-5
+bg-slate-900/60
+backdrop-blur-xl
+min-h-[700px]
+"
         >
 
-          <h2
-            className="
-              text-2xl font-bold
-              mb-5
-            "
-          >
-            AI Review
-          </h2>
+          {
 
-          {!review ? (
+            showQuestionInfo &&
+              question
 
-            <div
-              className="
-                h-full flex items-center
-                justify-center
-                text-gray-500
-              "
-            >
+              ?
 
-              Submit your code to get feedback 🚀
+              (
 
-            </div>
+                <div>
 
-          ) : (
+                  <h2
+                    className="
+text-2xl
+font-bold
+mb-5
+text-cyan-400
+"
+                  >
 
-            <div className="space-y-5">
+                    📝 Problem Details
 
-              {/* Status */}
-              <div>
+                  </h2>
 
-                <p className="text-sm text-gray-400 mb-1">
-                  Status
-                </p>
 
-                <div
-                  className="
-                    inline-block
-                    px-4 py-2 rounded-xl
-                    bg-green-500/20
-                    text-green-300
-                    border border-green-500/30
-                  "
-                >
-                  {review.status}
+                  <div
+                    className="
+space-y-5
+"
+                  >
+
+                    <div>
+
+                      <p
+                        className="
+text-sm
+text-gray-400
+mb-2
+"
+                      >
+
+                        Description
+
+                      </p>
+
+                      <div
+                        className="
+p-4
+
+rounded-xl
+
+bg-slate-800
+
+border
+border-slate-700
+"
+                      >
+
+                        {question.description}
+
+                      </div>
+
+                    </div>
+
+
+                    <div>
+
+                      <p
+                        className="
+text-sm
+text-gray-400
+mb-2
+"
+                      >
+
+                        Example
+
+                      </p>
+
+                      <pre
+                        className="
+p-4
+
+rounded-xl
+
+bg-black/40
+
+border
+border-slate-700
+
+text-green-300
+
+whitespace-pre-wrap
+overflow-auto
+"
+                      >
+
+                        {question.example}
+
+                      </pre>
+
+                    </div>
+
+
+                    <div
+                      className="
+flex gap-3
+"
+                    >
+
+                      <span
+                        className="
+px-3 py-1
+
+rounded-xl
+
+bg-blue-500/20
+"
+                      >
+
+                        {question.topic}
+
+                      </span>
+
+                      <span
+                        className="
+px-3 py-1
+
+rounded-xl
+
+bg-yellow-500/20
+"
+                      >
+
+                        {question.difficulty}
+
+                      </span>
+
+                    </div>
+
+                  </div>
+
                 </div>
 
-              </div>
+              )
 
-              {/* Explanation */}
-              <div>
+              :
 
-                <p className="text-sm text-gray-400 mb-2">
-                  Explanation
-                </p>
+              (
 
-                <div
-                  className="
-                    p-4 rounded-xl
-                    bg-slate-800
-                    border border-slate-700
-                  "
-                >
-                  {review.explanation}
+                <div>
+
+                  <h2
+                    className="
+text-2xl
+font-bold
+mb-5
+"
+                  >
+
+                    🧠 AI Review
+
+                  </h2>
+
+                  {
+
+                    !review ?
+
+                      (
+
+                        <div
+                          className="
+text-gray-500
+"
+                        >
+
+                          Submit code for AI review 🚀
+
+                        </div>
+
+                      )
+
+                      :
+
+                      (
+
+                        <div
+                          className="
+space-y-5
+"
+                        >
+
+                          <div>
+
+                            <span
+                              className="
+px-4 py-2
+
+rounded-xl
+
+bg-blue-500/20
+"
+                            >
+
+                              {review.status}
+
+                            </span>
+
+                          </div>
+
+                          <div
+                            className="
+p-4
+
+rounded-xl
+
+bg-slate-800
+"
+                          >
+
+                            {review.feedback.summary}
+
+                          </div>
+
+                          {renderList(
+                            "❌ Bugs",
+                            review.feedback.bugs
+                          )}
+
+                          {renderList(
+                            "⚡ Optimization",
+                            review.feedback.optimization
+                          )}
+
+                          {renderList(
+                            "📖 Readability",
+                            review.feedback.readability
+                          )}
+
+                          {renderList(
+                            "🚀 Best Practices",
+                            review.feedback.bestPractices
+                          )}
+
+                          <div
+                            className="
+p-5
+
+rounded-xl
+
+bg-yellow-500/10
+
+border border-yellow-500/30
+
+text-yellow-300
+font-bold
+"
+                          >
+
+                            +{review.earnedXp} XP ⚡
+
+                          </div>
+
+                        </div>
+
+                      )
+
+                  }
+
                 </div>
 
-              </div>
+              )
 
-              {/* Suggestion */}
-              <div>
-
-                <p className="text-sm text-gray-400 mb-2">
-                  Suggestion
-                </p>
-
-                <div
-                  className="
-                    p-4 rounded-xl
-                    bg-slate-800
-                    border border-slate-700
-                  "
-                >
-                  {review.suggestion}
-                </div>
-
-              </div>
-
-              {/* XP */}
-              <div
-                className="
-                  p-5 rounded-2xl
-                  bg-yellow-500/10
-                  border border-yellow-500/20
-                "
-              >
-
-                <p
-                  className="
-                    text-yellow-300
-                    text-xl font-bold
-                  "
-                >
-                  +{review.earnedXP} XP Earned ⚡
-                </p>
-
-              </div>
-
-            </div>
-
-          )}
+          }
 
         </Card>
-
       </div>
 
     </DashboardLayout>
+
   );
+
 }

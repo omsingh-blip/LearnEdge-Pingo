@@ -11,102 +11,33 @@ export default function Modules() {
   const { domain } =
     useParams();
 
-  // ================= MODULE DATA =================
   const modulesData = {
 
     dsa: {
-      title: "DSA",
-
-      pdf: "/pdfs/dsa.pdf",
-
-      quiz: [
-        {
-          q: "What is time complexity of binary search?",
-          options: [
-            "O(n)",
-            "O(log n)",
-            "O(n log n)",
-            "O(1)",
-          ],
-          answer: "O(log n)",
-        },
-      ],
+      title:
+        "Data Structures & Algorithms",
     },
 
     webdev: {
-      title: "Web Dev",
-
-      pdf: "/pdfs/web.pdf",
-
-      quiz: [
-        {
-          q: "HTML stands for?",
-          options: [
-            "Hyper Trainer Marking Language",
-            "Hyper Text Markup Language",
-            "Hyper Text Marketing Language",
-            "Hyper Text Machine Language",
-          ],
-          answer:
-            "Hyper Text Markup Language",
-        },
-      ],
+      title: "Web Development",
     },
 
     ml: {
       title: "Machine Learning",
-
-      pdf: "/pdfs/ml.pdf",
-
-      quiz: [
-        {
-          q: "ML stands for?",
-
-          options: [
-            "Machine Learning",
-            "Model Learning",
-            "Manual Learning",
-            "Meta Learning",
-          ],
-
-          answer:
-            "Machine Learning",
-        },
-      ],
     },
 
     agrinova: {
       title: "AgriNova",
-
-      pdf: "/pdfs/agrinova.pdf",
-
-      quiz: [
-        {
-          q: "Smart irrigation uses?",
-
-          options: [
-            "AI",
-            "Water",
-            "Soil",
-            "Manual",
-          ],
-
-          answer: "AI",
-        },
-      ],
     },
 
   };
 
-  // ================= SELECT MODULE =================
   const module =
     modulesData[domain];
 
-  // ================= SAFETY =================
   if (!module) {
 
     return (
-
       <div
         className="
           min-h-screen
@@ -120,9 +51,7 @@ export default function Modules() {
         Domain not found
 
       </div>
-
     );
-
   }
 
   return (
@@ -135,7 +64,7 @@ export default function Modules() {
       "
     >
 
-      {/* Back Button */}
+      {/* Back */}
       <button
         onClick={() =>
           navigate("/dashboard")
@@ -148,8 +77,6 @@ export default function Modules() {
           border border-slate-700
 
           hover:border-blue-400
-
-          hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]
 
           transition-all duration-300
         "
@@ -178,7 +105,7 @@ export default function Modules() {
           "
         >
 
-          {module.title} Module
+          {module.title}
 
           <img
             src="/pingo-thinking.png"
@@ -210,7 +137,9 @@ export default function Modules() {
 
               border border-slate-700
 
-              hover:border-blue-400
+              hover:border-cyan-400
+
+              hover:shadow-[0_0_25px_rgba(34,211,238,0.25)]
 
               transition-all duration-300
             "
@@ -219,10 +148,10 @@ export default function Modules() {
             <h2
               className="
                 text-xl font-semibold
-                mb-3 text-blue-400
+                mb-3 text-cyan-400
               "
             >
-              📄 Notes
+              📘 Smart Notes
             </h2>
 
             <p
@@ -230,21 +159,21 @@ export default function Modules() {
                 text-gray-400 mb-4
               "
             >
-              Learn concepts before quiz.
+              Interactive markdown notes.
             </p>
 
-            <a
-              href={module.pdf}
-
-              target="_blank"
-
-              rel="noreferrer"
+            <button
+              onClick={() =>
+                navigate(
+                  `/modules/${domain}/notes`
+                )
+              }
 
               className="
                 inline-block
                 px-5 py-2 rounded-lg
 
-                bg-blue-500
+                bg-cyan-500
 
                 hover:scale-105
 
@@ -252,9 +181,9 @@ export default function Modules() {
               "
             >
 
-              View PDF
+              Open Notes
 
-            </a>
+            </button>
 
           </div>
 
@@ -270,6 +199,8 @@ export default function Modules() {
 
               hover:border-green-400
 
+              hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]
+
               transition-all duration-300
             "
           >
@@ -280,7 +211,7 @@ export default function Modules() {
                 mb-3 text-green-400
               "
             >
-              📝 Quick Quiz
+              🧠 Dynamic Quiz
             </h2>
 
             <p
@@ -288,19 +219,14 @@ export default function Modules() {
                 text-gray-400 mb-4
               "
             >
-              Test your understanding.
+              Real-time backend powered quiz.
             </p>
 
             <button
               onClick={() =>
-                navigate("/quiz", {
-
-                  state: {
-                    quiz:
-                      module.quiz,
-                  },
-
-                })
+                navigate(
+                  `/modules/${domain}/quiz`
+                )
               }
 
               className="

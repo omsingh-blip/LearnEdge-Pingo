@@ -26,6 +26,9 @@ export default function CodeReview() {
   const [output, setOutput] =
     useState("");
 
+  const [running, setRunning] =
+    useState(false);
+
   const [language, setLanguage] =
     useState("javascript");
 
@@ -83,65 +86,65 @@ export default function CodeReview() {
   };
 
   // ================= RUN CODE =================
-const handleRunCode = async () => {
+  const handleRunCode = async () => {
 
-  setRunning(true);
+    setRunning(true);
 
-  setOutput("Running code...");
+    setOutput("Running code...");
 
-  try {
+    try {
 
-    if (
-      language !== "javascript"
-    ) {
+      if (
+        language !== "javascript"
+      ) {
+
+        setOutput(
+          "⚠️ Currently only JavaScript execution is supported locally."
+        );
+
+        setRunning(false);
+
+        return;
+      }
+
+      let logs = [];
+
+      const originalLog =
+        console.log;
+
+      console.log = (...args) => {
+
+        logs.push(
+          args.join(" ")
+        );
+
+      };
+
+      // Execute user code
+      eval(code);
+
+      console.log =
+        originalLog;
 
       setOutput(
-        "⚠️ Currently only JavaScript execution is supported locally."
+
+        logs.length
+          ? logs.join("\n")
+          : "✅ Code executed successfully."
+
       );
 
-      setRunning(false);
+    } catch (error) {
 
-      return;
+      setOutput(
+        "❌ " + error.message
+      );
+
     }
 
-    let logs = [];
+    setRunning(false);
 
-    const originalLog =
-      console.log;
-
-    console.log = (...args) => {
-
-      logs.push(
-        args.join(" ")
-      );
-
-    };
-
-    // Execute user code
-    eval(code);
-
-    console.log =
-      originalLog;
-
-    setOutput(
-
-      logs.length
-        ? logs.join("\n")
-        : "✅ Code executed successfully."
-
-    );
-
-  } catch (error) {
-
-    setOutput(
-      "❌ " + error.message
-    );
-
-  }
-
-  setRunning(false);
-
-};
+  };
 
   return (
     <DashboardLayout>
@@ -215,7 +218,8 @@ const handleRunCode = async () => {
       <div className="mt-4 flex gap-4 justify-center">
 
         <Button
-          onClick={handleRun}
+          onClick={handleRunCode}
+          disabled={running}
           className="max-w-[180px] bg-green-600"
         >
           ▶ Run Code
@@ -226,6 +230,7 @@ const handleRunCode = async () => {
             handleReview({
               code,
               problem,
+              language,
             })
           }
           disabled={loading}

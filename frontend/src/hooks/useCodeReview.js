@@ -4,173 +4,259 @@ import {
   updateScore,
 } from "../services/leaderboardService";
 
-import {
-  reviewCode,
-} from "../services/reviewService";
+import { useGameStore }
+from "../store/useGameStore";
 
-import { useGameStore } from "../store/useGameStore";
+export default function useCodeReview(){
 
-import { useAuthStore } from "../store/authStore";
+const {
 
-export default function useCodeReview() {
+xp,
+level,
+addXP,
+setStreak
 
-  const {
-    xp,
-    level,
-    addXP,
-    setStreak,
-  } = useGameStore();
+}=useGameStore();
 
-  const { user } = useAuthStore();
+const [feedback,setFeedback]=
+useState(null);
 
-  // ================= STATE =================
-  const [feedback, setFeedback] =
-    useState(null);
+const [loading,setLoading]=
+useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+const [pingoState,setPingoState]=
+useState("idle");
 
-  const [pingoState, setPingoState] =
-    useState("idle");
+const [showLevelUp,setShowLevelUp]=
+useState(false);
 
-  const [showLevelUp, setShowLevelUp] =
-    useState(false);
 
-  // ================= REVIEW =================
-  const handleReview = async ({
-    code,
-    problem,
-  }) => {
+// ================= REVIEW =================
 
-    setLoading(true);
+const handleReview=
+async({
 
-    setPingoState("thinking");
+code,
+problem,
+language
 
-    setFeedback(null);
+})=>{
 
-    // Validation
-    if (!problem || !code) {
+setLoading(true);
 
-      setFeedback({
-        error:
-          "❌ Please enter problem and code",
-      });
+setPingoState(
+"thinking"
+);
 
-      setLoading(false);
+setFeedback(null);
 
-      setPingoState("idle");
+if(
+!problem ||
+!code
+){
 
-      return;
-    }
+setFeedback({
 
-    try {
+error:
+"❌ Please enter problem and code"
 
-      const data = await reviewCode({
-        question_name:
-          problem ||
-          "Unknown Problem",
+});
 
-        student_id:
-          user?.email ||
-          user?._id ||
-          "Unknown Student",
+setLoading(false);
 
-        student_solution:
-          code ||
-          "No solution provided",
-      });
+return;
 
-      // Streak
-      if (data.status === "success") {
-        setStreak((prev) => prev + 1);
-      } else {
-        setStreak(0);
-      }
+}
 
-      // XP
-      let earnedXp = 0;
+try{
 
-      if (data.status === "success") {
-        earnedXp = 50;
-      } else if (
-        data.status === "needs_work"
-      ) {
-        earnedXp = 20;
-      } else {
-        earnedXp = 10;
-      }
+const token=
+localStorage.getItem(
+"token"
+);
 
-      const previousLevel = level;
+const res=
+await fetch(
 
-      addXP(earnedXp);
+"http://localhost:5000/api/reviews",
 
-      const nextLevel =
-        Math.floor((xp + earnedXp) / 100) + 1;
+{
 
-      // Level up
-      if (nextLevel > previousLevel) {
+method:"POST",
 
-        setShowLevelUp(true);
+headers:{
 
-        setPingoState("happy");
+"Content-Type":
+"application/json",
 
-        setTimeout(() => {
-          setShowLevelUp(false);
-        }, 2000);
+Authorization:
+`Bearer ${token}`
 
-      }
+},
 
-      // Sync leaderboard
-      await updateScore(earnedXp);
+body:
+JSON.stringify({
 
-      // Feedback
-      setFeedback({
-        message:
-          `🎉 You earned +${earnedXp} XP!`,
+problem,
+language,
+code
 
-        explanation:
-          data.explanation,
+})
 
-        hint:
-          data.hint,
+}
 
-        issues:
-          data.issues,
+);
 
-        fixed_code:
-          data.fixed_code,
+const data=
+await res.json();
 
-        suggestion:
-          data.suggestion,
-      });
+if(
+!data.success
+){
 
-      setPingoState("happy");
+throw new Error(
+data.message
+);
 
-    } catch (error) {
+}
 
-      setFeedback({
-        error:
-          "❌ Error connecting to AI service",
-      });
+const review=
+data.review;
 
-      setPingoState("idle");
 
-    } finally {
+// STREAK
 
-      setLoading(false);
+setStreak(
+(prev)=>
+prev+1
+);
 
-    }
 
-  };
+// XP
 
-  return {
-    feedback,
-    loading,
-    pingoState,
-    showLevelUp,
+const earnedXp=
+review.earnedXp;
 
-    setPingoState,
+const previousLevel=
+level;
 
-    handleReview,
-  };
+addXP(
+earnedXp
+);
+
+
+// LEVEL UP
+
+const nextLevel=
+
+Math.floor(
+(xp+earnedXp)
+/100
+)+1;
+
+
+if(
+nextLevel >
+previousLevel
+){
+
+setShowLevelUp(
+true
+);
+
+setPingoState(
+"happy"
+);
+
+setTimeout(()=>{
+
+setShowLevelUp(
+false
+);
+
+},2000);
+
+}
+
+
+// LEADERBOARD
+
+await updateScore(
+earnedXp
+);
+
+
+// FEEDBACK
+
+setFeedback({
+
+message:
+`🎉 +${earnedXp} XP Earned`,
+
+status:
+review.status,
+
+summary:
+review.feedback.summary,
+
+bugs:
+review.feedback.bugs,
+
+optimization:
+review.feedback.optimization,
+
+readability:
+review.feedback.readability,
+
+bestPractices:
+review.feedback.bestPractices
+
+});
+
+setPingoState(
+"happy"
+);
+
+}
+
+catch(error){
+
+console.log(
+error
+);
+
+setFeedback({
+
+error:
+"❌ Review failed"
+
+});
+
+setPingoState(
+"idle"
+);
+
+}
+
+finally{
+
+setLoading(false);
+
+}
+
+};
+
+return{
+
+feedback,
+loading,
+pingoState,
+showLevelUp,
+
+setPingoState,
+
+handleReview
+
+};
+
 }

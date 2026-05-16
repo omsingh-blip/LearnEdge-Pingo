@@ -3,113 +3,280 @@ export default function FeedbackPanel({
   loading,
 }) {
 
+  const renderList = (
+    title,
+    emoji,
+    color,
+    items
+  ) => {
+
+    if (
+      !items ||
+      items.length === 0
+    ) return null;
+
+    return (
+
+      <div
+        className="
+          p-3 rounded-xl
+          bg-slate-900/70
+          border border-slate-700
+        "
+      >
+
+        <p
+          className={`font-semibold mb-2 ${color}`}
+        >
+
+          {emoji} {title}
+
+        </p>
+
+        <ul
+          className="
+            list-disc ml-5
+            space-y-2
+          "
+        >
+
+          {items.map(
+            (item, i) => (
+
+              <li
+                key={i}
+                className="
+                  text-gray-300
+                "
+              >
+
+                {item}
+
+              </li>
+
+            )
+          )}
+
+        </ul>
+
+      </div>
+
+    );
+
+  };
+
   return (
+
     <div
-      className="bg-slate-800/70 backdrop-blur-lg rounded-xl p-3 flex flex-col overflow-hidden
-      border border-slate-700
-      shadow-[0_0_25px_rgba(168,85,247,0.2)]"
+      className="
+        bg-slate-800/70
+        backdrop-blur-lg
+        rounded-xl
+        p-4
+        flex flex-col
+        overflow-hidden
+
+        border border-slate-700
+
+        shadow-[0_0_25px_rgba(168,85,247,0.2)]
+      "
     >
 
-      <h2 className="text-yellow-400 mb-2">
-        🐧 AI Feedback
+      <h2
+        className="
+          text-yellow-400
+          mb-4
+          text-xl
+          font-bold
+        "
+      >
+
+        🐧 AI Review
+
       </h2>
 
-      <div className="flex-1 overflow-auto text-sm space-y-3">
+      <div
+        className="
+          flex-1
+          overflow-auto
+          space-y-4
+        "
+      >
 
         {loading && (
-          <p>
-            Analyzing your code...
-          </p>
+
+          <div
+            className="
+              text-center
+              animate-pulse
+              text-cyan-400
+            "
+          >
+
+            🧠 Pingo is analyzing your code...
+
+          </div>
+
         )}
 
-        {!loading && !feedback && (
-          <p>
-            Your feedback will appear here...
-          </p>
+        {!loading &&
+        !feedback && (
+
+          <div
+            className="
+              text-center
+              text-gray-500
+              mt-10
+            "
+          >
+
+            Submit code for AI review 🚀
+
+          </div>
+
         )}
 
-        {!loading && feedback && (
+        {!loading &&
+        feedback && (
+
           <>
 
             {feedback.message && (
-              <p className="text-green-400 font-semibold">
+
+              <div
+                className="
+                  p-3 rounded-xl
+
+                  bg-green-500/10
+                  border border-green-500/30
+
+                  text-green-300
+                  font-semibold
+                "
+              >
+
                 {feedback.message}
-              </p>
+
+              </div>
+
             )}
 
             {feedback.error && (
-              <p className="text-red-400">
+
+              <div
+                className="
+                  p-3 rounded-xl
+
+                  bg-red-500/10
+                  border border-red-500/30
+
+                  text-red-300
+                "
+              >
+
                 {feedback.error}
-              </p>
-            )}
-
-            {feedback.issues?.length > 0 && (
-              <div>
-
-                <p className="text-red-400 font-semibold">
-                  ❌ Issues:
-                </p>
-
-                <ul className="list-disc ml-5">
-
-                  {feedback.issues.map(
-                    (issue, i) => (
-                      <li key={i}>
-                        {issue}
-                      </li>
-                    )
-                  )}
-
-                </ul>
 
               </div>
+
             )}
 
-            {feedback.hint && (
-              <p className="text-yellow-400">
-                💡 Hint:
+            {feedback.status && (
+
+              <div
+                className="
+                  inline-block
+
+                  px-4 py-2
+                  rounded-xl
+
+                  bg-blue-500/10
+                  border border-blue-500/30
+
+                  text-blue-300
+                  font-semibold
+                "
+              >
+
+                Status:
                 {" "}
-                {feedback.hint}
-              </p>
+                {feedback.status}
+
+              </div>
+
             )}
 
-            {feedback.explanation && (
-              <p className="text-blue-300">
-                🧠 Explanation:
-                {" "}
-                {feedback.explanation}
-              </p>
-            )}
+            {feedback.summary && (
 
-            {feedback.fixed_code && (
-              <div>
+              <div
+                className="
+                  p-4 rounded-xl
+                  bg-slate-900/70
+                  border border-slate-700
+                "
+              >
 
-                <p className="text-green-400">
-                  ✅ Fixed Code:
-                </p>
-
-                <pre
-                  className="bg-black p-2 rounded text-green-300 overflow-x-auto"
+                <p
+                  className="
+                    text-cyan-400
+                    font-semibold
+                    mb-2
+                  "
                 >
-                  {feedback.fixed_code}
-                </pre>
+
+                  🧠 Summary
+
+                </p>
+
+                <p
+                  className="
+                    text-gray-300
+                  "
+                >
+
+                  {feedback.summary}
+
+                </p>
 
               </div>
+
             )}
 
-            {feedback.suggestion && (
-              <p className="text-purple-300">
-                🚀 Suggestion:
-                {" "}
-                {feedback.suggestion}
-              </p>
+            {renderList(
+              "Bugs",
+              "❌",
+              "text-red-400",
+              feedback.bugs
+            )}
+
+            {renderList(
+              "Optimization",
+              "⚡",
+              "text-yellow-400",
+              feedback.optimization
+            )}
+
+            {renderList(
+              "Readability",
+              "📖",
+              "text-blue-400",
+              feedback.readability
+            )}
+
+            {renderList(
+              "Best Practices",
+              "🚀",
+              "text-purple-400",
+              feedback.bestPractices
             )}
 
           </>
+
         )}
 
       </div>
 
     </div>
+
   );
+
 }

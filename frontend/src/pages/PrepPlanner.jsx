@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function PrepPlanner() {
-  
+
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -31,7 +31,7 @@ export default function PrepPlanner() {
       setLoading(true);
 
       const res = await axios.post(
-        "https://learnedge-ai-code-review-assistant-final.onrender.com/api/v1/prep-planner",
+        "http://localhost:5000/api/prep-planner",
         {
           student_id: user?.email || user?._id || "Unknown Student",
           domain: form.domain,

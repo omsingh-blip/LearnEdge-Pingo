@@ -24,6 +24,7 @@ import PageWrapper from "./components/layout/PageWrapper";
 import { useAuthStore } from "./store/authStore";
 
 // ================= LAZY PAGES =================
+
 const Home = lazy(() =>
   import("./pages/Home")
 );
@@ -52,6 +53,10 @@ const Quiz = lazy(() =>
   import("./pages/Quiz")
 );
 
+const NotesViewer = lazy(() =>
+  import("./pages/NotesViewer")
+);
+
 const PrepPlanner = lazy(() =>
   import("./pages/PrepPlanner")
 );
@@ -59,23 +64,55 @@ const PrepPlanner = lazy(() =>
 const Practice = lazy(() =>
   import("./pages/Practice")
 );
+
+const DsaSheet = lazy(() =>
+  import("./pages/DsaSheet")
+);
+
+// ================= ADMIN =================
+
+const Admin = lazy(() =>
+  import("./pages/Admin")
+);
+
+const AdminRoute = lazy(() =>
+  import("./components/AdminRoute")
+);
+
+const AdminQuiz = lazy(() =>
+  import("./pages/AdminQuiz")
+);
+
+const AdminNotes = lazy(() =>
+  import("./pages/AdminNotes")
+);
+
+const AdminDsa = lazy(() =>
+  import("./pages/AdminDsa")
+);
+
 // ================= ROUTES =================
+
 function AnimatedRoutes() {
 
   const location =
     useLocation();
 
   return (
+
     <AnimatePresence mode="wait">
 
-      <Suspense fallback={<Loader />}>
+      <Suspense
+        fallback={<Loader />}
+      >
 
         <Routes
           location={location}
           key={location.pathname}
         >
 
-          {/* Public */}
+          {/* ================= PUBLIC ================= */}
+
           <Route
             path="/"
             element={
@@ -103,8 +140,13 @@ function AnimatedRoutes() {
             }
           />
 
-          {/* Protected */}
-          <Route element={<ProtectedRoute />}>
+          {/* ================= PROTECTED ================= */}
+
+          <Route
+            element={
+              <ProtectedRoute />
+            }
+          >
 
             <Route
               path="/dashboard"
@@ -117,22 +159,25 @@ function AnimatedRoutes() {
 
             <Route
               path="/practice"
-              element={<Practice />}
+              element={
+                <Practice />
+              }
             />
+
             <Route
-              path="/code"
+              path="/dsa-sheet"
               element={
                 <PageWrapper>
-                  <CodeReview />
+                  <DsaSheet />
                 </PageWrapper>
               }
             />
 
             <Route
-             path="/modules/:domain"
+              path="/code"
               element={
                 <PageWrapper>
-                  <Modules />
+                  <CodeReview />
                 </PageWrapper>
               }
             />
@@ -147,10 +192,74 @@ function AnimatedRoutes() {
             />
 
             <Route
-              path="/quiz"
+              path="/modules/:domain"
+              element={
+                <PageWrapper>
+                  <Modules />
+                </PageWrapper>
+              }
+            />
+
+            <Route
+              path="/modules/:domain/notes"
+              element={
+                <PageWrapper>
+                  <NotesViewer />
+                </PageWrapper>
+              }
+            />
+
+            <Route
+              path="/modules/:domain/quiz"
               element={
                 <PageWrapper>
                   <Quiz />
+                </PageWrapper>
+              }
+            />
+
+          </Route>
+
+          {/* ================= ADMIN ================= */}
+
+          <Route
+            element={
+              <AdminRoute />
+            }
+          >
+
+            <Route
+              path="/admin"
+              element={
+                <PageWrapper>
+                  <Admin />
+                </PageWrapper>
+              }
+            />
+
+            <Route
+              path="/admin/quiz"
+              element={
+                <PageWrapper>
+                  <AdminQuiz />
+                </PageWrapper>
+              }
+            />
+
+            <Route
+              path="/admin/notes"
+              element={
+                <PageWrapper>
+                  <AdminNotes />
+                </PageWrapper>
+              }
+            />
+
+            <Route
+              path="/admin/dsa"
+              element={
+                <PageWrapper>
+                  <AdminDsa />
                 </PageWrapper>
               }
             />
@@ -162,26 +271,35 @@ function AnimatedRoutes() {
       </Suspense>
 
     </AnimatePresence>
+
   );
+
 }
 
 // ================= APP =================
+
 function App() {
 
-  const { checkAuth } =
-    useAuthStore();
+  const {
+    checkAuth
+  } = useAuthStore();
 
   useEffect(() => {
+
     checkAuth();
+
   }, []);
 
   return (
+
     <BrowserRouter>
 
       <AnimatedRoutes />
 
     </BrowserRouter>
+
   );
+
 }
 
 export default App;

@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Code2,
   CalendarDays,
+  ClipboardList,
   LogOut,
   Menu,
   X,
@@ -19,8 +20,11 @@ import { useAuthStore } from "../../store/authStore";
 
 export default function Navbar() {
 
-  const { logout } =
-    useAuthStore();
+  // FIXED: added user
+  const {
+    user,
+    logout
+  } = useAuthStore();
 
   const [mobileOpen,
     setMobileOpen] =
@@ -35,16 +39,14 @@ export default function Navbar() {
     flex items-center gap-2
     text-sm md:text-base
 
-    ${
-      isActive
-        ? "bg-blue-500/20 text-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
-        : "text-gray-300 hover:text-white hover:bg-white/5"
+    ${isActive
+      ? "bg-blue-500/20 text-blue-300 shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+      : "text-gray-300 hover:text-white hover:bg-white/5"
     }
   `;
 
   return (
     <motion.nav
-
       initial={{
         y: -40,
         opacity: 0,
@@ -65,15 +67,11 @@ export default function Navbar() {
       <div
         className="
           max-w-7xl mx-auto
-
           bg-slate-900/70
           backdrop-blur-xl
-
           border border-slate-700
           rounded-2xl
-
           px-4 md:px-8 py-4
-
           shadow-[0_0_40px_rgba(59,130,246,0.15)]
         "
       >
@@ -95,7 +93,6 @@ export default function Navbar() {
             <img
               src="/companyLogo.png"
               alt="LearnEdge"
-
               className="
                 w-10 h-10 rounded-full
                 shadow-[0_0_15px_rgba(59,130,246,0.5)]
@@ -125,7 +122,7 @@ export default function Navbar() {
               to="/dashboard"
               className={navClass}
             >
-              <LayoutDashboard size={18} />
+              <LayoutDashboard size={18}/>
               Dashboard
             </NavLink>
 
@@ -133,36 +130,52 @@ export default function Navbar() {
               to="/practice"
               className={navClass}
             >
-              <Code2 size={18} />
+              <Code2 size={18}/>
               Practice
+            </NavLink>
+
+            <NavLink
+              to="/dsa-sheet"
+              className={navClass}
+            >
+              <ClipboardList size={18}/>
+              DSA Sheet
             </NavLink>
 
             <NavLink
               to="/prep-planner"
               className={navClass}
             >
-              <CalendarDays size={18} />
+              <CalendarDays size={18}/>
               Planner
             </NavLink>
+
+            {/* ADMIN BUTTON */}
+            {user?.role === "admin" && (
+
+              <NavLink
+                to="/admin"
+                className={navClass}
+              >
+                ⚙ Admin
+              </NavLink>
+
+            )}
 
             <button
               onClick={logout}
 
               className="
                 px-4 py-2 rounded-xl
-
                 flex items-center gap-2
-
                 text-red-300
-
                 hover:bg-red-500/10
                 hover:text-red-200
-
                 transition-all duration-300
               "
             >
 
-              <LogOut size={18} />
+              <LogOut size={18}/>
 
               Logout
 
@@ -170,7 +183,7 @@ export default function Navbar() {
 
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu */}
           <button
             onClick={() =>
               setMobileOpen(
@@ -186,8 +199,9 @@ export default function Navbar() {
           >
 
             {mobileOpen
-              ? <X />
-              : <Menu />}
+              ? <X/>
+              : <Menu/>
+            }
 
           </button>
 
@@ -199,11 +213,8 @@ export default function Navbar() {
           <div
             className="
               md:hidden
-
               mt-4 pt-4
-
               border-t border-slate-700
-
               flex flex-col gap-3
             "
           >
@@ -211,38 +222,61 @@ export default function Navbar() {
             <NavLink
               to="/dashboard"
               className={navClass}
-
               onClick={() =>
                 setMobileOpen(false)
               }
             >
-              <LayoutDashboard size={18} />
+              <LayoutDashboard size={18}/>
               Dashboard
             </NavLink>
 
             <NavLink
               to="/practice"
               className={navClass}
-
               onClick={() =>
                 setMobileOpen(false)
               }
             >
-              <Code2 size={18} />
+              <Code2 size={18}/>
               Practice
+            </NavLink>
+
+            <NavLink
+              to="/dsa-sheet"
+              className={navClass}
+              onClick={() =>
+                setMobileOpen(false)
+              }
+            >
+              <ClipboardList size={18}/>
+              DSA Sheet
             </NavLink>
 
             <NavLink
               to="/prep-planner"
               className={navClass}
-
               onClick={() =>
                 setMobileOpen(false)
               }
             >
-              <CalendarDays size={18} />
+              <CalendarDays size={18}/>
               Planner
             </NavLink>
+
+            {/* ADMIN BUTTON */}
+            {user?.role === "admin" && (
+
+              <NavLink
+                to="/admin"
+                className={navClass}
+                onClick={() =>
+                  setMobileOpen(false)
+                }
+              >
+                ⚙ Admin
+              </NavLink>
+
+            )}
 
             <button
               onClick={() => {
@@ -255,19 +289,14 @@ export default function Navbar() {
 
               className="
                 px-4 py-2 rounded-xl
-
                 flex items-center gap-2
-
                 text-red-300
-
                 hover:bg-red-500/10
-
                 transition-all duration-300
               "
             >
 
-              <LogOut size={18} />
-
+              <LogOut size={18}/>
               Logout
 
             </button>
