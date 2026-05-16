@@ -79,7 +79,7 @@ PingO combines AI assistance, code review, quizzes, DSA practice, study planning
 
 ## Home Page
 
-![Home](./screenshots/home.png)
+![Home](./screenshots/home1.png)
 
 ---
 
