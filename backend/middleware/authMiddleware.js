@@ -1,46 +1,118 @@
 import jwt from "jsonwebtoken";
 
-const authMiddleware = (
-  req,
-  res,
-  next
-) => {
+import User from "../models/User.js";
 
-  try {
+const authMiddleware =
+async (
+req,
+res,
+next
+)=>{
 
-    const authHeader =
-      req.headers.authorization;
+try{
 
-    if (
-      !authHeader ||
-      !authHeader.startsWith("Bearer ")
-    ) {
-      return res.status(401).json({
-        success: false,
-        msg: "No token provided",
-      });
-    }
+const authHeader=
+req.headers.authorization;
 
-    const token =
-      authHeader.split(" ")[1];
+if(
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+!authHeader ||
 
-    req.user = decoded;
+!authHeader.startsWith(
+"Bearer "
+)
 
-    next();
+){
 
-  } catch (error) {
+return res.status(401).json({
 
-    return res.status(401).json({
-      success: false,
-      msg: "Invalid or expired token",
-    });
+success:false,
 
-  }
+msg:"No token provided"
+
+});
+
+}
+
+const token=
+authHeader.split(
+" "
+)[1];
+
+const decoded=
+jwt.verify(
+
+token,
+process.env.JWT_SECRET
+
+);
+
+const user=
+await User.findById(
+decoded.id
+)
+.select(
+"-password"
+);
+
+if(!user){
+
+return res.status(404).json({
+
+success:false,
+
+msg:"User not found"
+
+});
+
+}
+
+req.user={
+
+id:user._id,
+
+name:user.name,
+
+email:user.email,
+
+role:user.role
+
+};
+
+next();
+
+}
+
+catch(error){
+
+if(
+
+error.name===
+
+"TokenExpiredError"
+
+){
+
+return res.status(401).json({
+
+success:false,
+
+msg:"Token expired"
+
+});
+
+}
+
+return res.status(401).json({
+
+success:false,
+
+msg:"Invalid token"
+
+});
+
+}
+
 };
 
 export default authMiddleware;

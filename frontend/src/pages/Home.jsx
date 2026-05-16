@@ -1,635 +1,534 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useMemo } from "react";
+import BackgroundEffects
+from "../components/layout/BackgroundEffects";
 
 export default function Home() {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const features = [
-    {
-      title: "🧠 AI Code Review",
-      desc: "Instant feedback on your code.",
-    },
+  const features =
+    useMemo(() => [
 
-    {
-      title: "🏆 Leaderboard",
-      desc: "Compete globally in real-time.",
-    },
+      {
+        title:"🧠 AI Code Review",
+        desc:"Instant feedback on your code."
+      },
 
-    {
-      title: "⚡ Prep Planner",
-      desc: "1-day smart strategy.",
-    },
+      {
+        title:"🏆 Leaderboard",
+        desc:"Compete globally in real-time."
+      },
 
-    {
-      title: "🎯 Gamified XP",
-      desc: "Level up your learning.",
-    },
+      {
+        title:"⚡ Prep Planner",
+        desc:"1-day smart strategy."
+      },
 
-    {
-      title: "🤖 AI Assistant",
-      desc: "Your personal tutor.",
-    },
+      {
+        title:"🎯 Gamified XP",
+        desc:"Level up your learning."
+      },
 
-    {
-      title: "📚 Smart Modules",
-      desc: "Learn + test instantly.",
-    },
-  ];
+      {
+        title:"🤖 AI Assistant",
+        desc:"Your personal tutor."
+      },
 
-  // ================= CURSOR GLOW =================
-  useEffect(() => {
+      {
+        title:"📚 Smart Modules",
+        desc:"Learn + test instantly."
+      }
 
-    const glow =
-      document.getElementById(
-        "cursor-glow"
-      );
+    ],[]);
 
-    const move = (e) => {
-
-      if (!glow) return;
-
-      glow.style.left =
-        e.clientX - 80 + "px";
-
-      glow.style.top =
-        e.clientY - 80 + "px";
-    };
-
-    window.addEventListener(
-      "mousemove",
-      move
+  // Infinite loop source
+  const infiniteFeatures =
+    useMemo(
+      ()=>[
+        ...features,
+        ...features,
+        ...features
+      ],
+      [features]
     );
 
-    return () =>
-      window.removeEventListener(
-        "mousemove",
-        move
-      );
+  return(
 
-  }, []);
-
-  return (
-    <div
-      className="
-        h-screen
-        bg-slate-900
-        text-white
-        overflow-hidden
-        relative
-      "
-    >
-
-      {/* Stars Background */}
-      <div
-        className="
-          absolute inset-0
-          z-0
-          pointer-events-none
-        "
-      >
-
-        <div className="stars"></div>
-
-        <div
-          className="
-            stars
-            opacity-40
-          "
-        ></div>
-
-        <div className="stars2"></div>
-
-        <div className="stars3"></div>
-
-      </div>
-
-      {/* Shooting Stars */}
-      <div
-        className="
-          shooting-stars
-          absolute inset-0
-          z-0
-          pointer-events-none
-        "
-      >
-
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-
-      </div>
-
-      {/* Cursor Glow */}
-      <div
-        id="cursor-glow"
-
-        className="
-          pointer-events-none
-          fixed
-
-          w-40 h-40
-
-          rounded-full
-          blur-3xl
-
-          opacity-20
-
-          bg-blue-400
-
-          z-0
-        "
-      ></div>
-
-      {/* Overlay */}
-      <div
-        className="
-          absolute inset-0
-
-          bg-gradient-to-b
-          from-transparent
-          via-slate-900/40
-          to-slate-900
-
-          z-0
-        "
-      ></div>
-
-      {/* HERO */}
-      <div
-       className="
-  flex flex-col
-  items-center
-  justify-center
-
-  text-center
-
-  pt-8
-  pb-2
-  px-6
-
-  relative
-  z-10
-"
-      >
-
-        {/* Glow */}
-        <div
-          className="
-            absolute
-
-            w-80 h-80
-
-            bg-blue-500
-
-            opacity-30
-
-            blur-3xl
-
-            rounded-full
-          "
-        ></div>
-
-        {/* Mascot */}
-       {/* Mascot Video Only */}
 <div
-  className="
-    relative
-    mb-6
-
-    flex
-    items-center
-    justify-center
-
-    animate-breathe
-  "
+className="
+h-screen
+bg-slate-900
+text-white
+overflow-hidden
+relative
+"
 >
 
-  {/* Soft neon outer glow */}
-  <div
-    className="
-      absolute
+{/* Background */}
 
-      w-40 h-40
-      md:w-52 md:h-52
+<BackgroundEffects />
 
-      rounded-full
 
-      bg-cyan-500/20
 
-      blur-3xl
+{/* HERO */}
 
-      opacity-80
-    "
-  />
+<div
 
-  {/* Circular frame */}
-  <div
-    className="
-      relative
+className="
+flex
+flex-col
 
-      w-32 h-32
-      md:w-40 md:h-40
+items-center
+justify-center
 
-      rounded-full
-      overflow-hidden
+text-center
 
-      border
-      border-cyan-400/50
+pt-8
+pb-2
+px-6
 
-      bg-slate-900
+relative
+z-10
+"
 
-      shadow-[0_0_40px_rgba(59,130,246,0.7)]
+>
 
-      animate-breathe
+{/* Hero glow */}
 
-      transition-all
-      duration-500
+<div
 
-      hover:scale-105
-      hover:shadow-[0_0_60px_rgba(59,130,246,1)]
-    "
-  >
+className="
+absolute
 
-    <video
-      autoPlay
-      loop
-      muted
-      playsInline
+w-72
+h-72
 
-      className="
-        w-full
-        h-full
+bg-blue-500/20
 
-        object-cover
+blur-2xl
 
-        animate-breathe
-      "
-    >
+rounded-full
+"
 
-      <source
-        src="/mascot.mp4"
-        type="video/mp4"
-      />
+/>
 
-    </video>
 
-  </div>
+{/* Mascot */}
+
+<div
+
+className="
+relative
+
+mb-6
+
+flex
+items-center
+justify-center
+
+animate-breathe
+"
+
+>
+
+<div
+
+className="
+absolute
+
+w-40
+h-40
+
+md:w-52
+md:h-52
+
+rounded-full
+
+bg-cyan-500/10
+
+blur-2xl
+"
+
+/>
+
+
+<div
+
+className="
+relative
+
+w-32 h-32
+md:w-40 md:h-40
+
+rounded-full
+overflow-hidden
+
+border
+border-cyan-400/30
+
+bg-slate-900
+
+shadow-lg
+shadow-cyan-500/20
+
+animate-breathe
+
+transition-transform
+duration-300
+
+hover:scale-[1.03]
+"
+
+>
+
+<video
+
+autoPlay
+loop
+muted
+playsInline
+
+className="
+w-full
+h-full
+object-cover
+"
+
+>
+
+<source
+src="/mascot.mp4"
+type="video/mp4"
+/>
+
+</video>
 
 </div>
 
-        {/* Heading */}
-        <h1
-          className="
-            text-4xl
-            md:text-6xl
+</div>
 
-            font-bold
 
-            mb-2
+{/* Heading */}
 
-            leading-tight
+<h1
 
-            transition-all
-            duration-500
+className="
+text-4xl
+md:text-6xl
 
-            hover:scale-105
+font-bold
 
-            hover:drop-shadow-[0_0_35px_rgba(96,165,250,1)]
-          "
-        >
+mb-2
 
-          PingO
-          {" "}
+leading-tight
+"
 
-          <span
-            className="
-              text-blue-400
-            "
-          >
-            AI
-          </span>
+>
 
-          <img
-            src="/rocket.png"
+PingO
 
-            className="
-              inline-block
+<span
+className="
+text-blue-400
+"
+>
 
-              w-12 md:w-16
+{" "}AI
 
-              ml-2
+</span>
 
-              animate-breathe
-            "
-          />
+<img
 
-        </h1>
+src="/rocket.png"
 
-        {/* Subtitle */}
-        <p
-          className="
-            text-gray-400
+className="
+inline-block
 
-            max-w-xl
+w-14
+md:w-16
 
-            mb-4
+ml-2
+"
 
-            text-base md:text-lg
+/>
 
-            leading-relaxed
-          "
-        >
+</h1>
 
-          Crack interviews & exams
-          with AI-powered learning,
-          real-time feedback,
-          and smart prep tools.
 
-        </p>
+{/* Subtitle */}
 
-        {/* Buttons */}
-        <div
-          className="
-            flex gap-5
-            flex-wrap
-            justify-center
-          "
-        >
+<p
 
-          <button
-            onClick={() =>
-              navigate("/login")
-            }
+className="
+text-gray-400
 
-            className="
-              group
-              relative
+max-w-xl
 
-              px-7 py-3
+mb-4
 
-              rounded-lg
+text-base
+md:text-lg
+"
 
-              bg-slate-800
+>
 
-              border border-slate-600
+Crack interviews & exams
+with AI-powered learning,
+real-time feedback,
+and smart prep tools.
 
-              transition-all
-              duration-300
+</p>
 
-              hover:scale-105
-            "
-          >
 
-            <span
-              className="
-                absolute inset-0
+{/* Buttons */}
 
-                rounded-lg
+<div
 
-                bg-green-400
+className="
+flex
+gap-5
+flex-wrap
+justify-center
+"
 
-                opacity-0
+>
 
-                group-hover:opacity-20
+<button
 
-                blur-xl
+onClick={()=>
+navigate("/login")
+}
 
-                transition
-              "
-            ></span>
+className="
+px-7 py-3
 
-            <span
-              className="
-                relative z-10
-              "
-            >
+rounded-lg
 
-              Login
+bg-slate-800
 
-            </span>
+border
+border-slate-600
 
-          </button>
+transition-transform
+duration-300
 
-          <button
-            onClick={() =>
-              navigate("/login")
-            }
+hover:scale-[1.03]
+"
 
-            className="
-              px-7 py-3
+>
 
-              rounded-lg
+Login
 
-              bg-blue-600
+</button>
 
-              transition-all
-              duration-300
 
-              hover:scale-105
+<button
 
-              hover:shadow-[0_0_30px_rgba(59,130,246,0.7)]
-            "
-          >
+onClick={()=>
+navigate("/login")
+}
 
-            Get Started
+className="
+px-7 py-3
 
-          </button>
+rounded-lg
 
-        </div>
+bg-blue-600
 
-      </div>
+transition-transform
+duration-300
 
-      {/* FEATURES */}
-      <div
-        className="
-          overflow-hidden
+hover:scale-[1.03]
 
-          py-2
+hover:shadow-lg
+hover:shadow-blue-500/20
+"
 
-          relative
-          z-10
-        "
-      >
+>
 
-        <div
-          className="
-            flex gap-6
+Get Started
 
-            animate-scrollX
+</button>
 
-            w-max
+</div>
 
-            px-6
-          "
-        >
+</div>
 
-          {[...features, ...features]
-            .map((f, i) => (
 
-              <div
-                key={i}
+{/* Features */}
 
-                className="
-                  min-w-[260px]
+<div
 
-                  bg-slate-800/70
-                  backdrop-blur-lg
+className="
+overflow-hidden
+py-2
 
-                  p-6
+relative
+z-10
+"
 
-                  rounded-2xl
+>
 
-                  border
-                  border-slate-700
+<div
 
-                  transition-all
-                  duration-300
+className="
+flex
+gap-6
 
-                  hover:border-blue-400
+animate-scrollX
 
-                  hover:shadow-[0_0_30px_rgba(59,130,246,0.6)]
+w-max
 
-                  hover:scale-[1.05]
-                "
-              >
+px-6
+"
 
-                <h2
-                  className="
-                    text-lg
-                    font-semibold
+>
 
-                    mb-2
+{
 
-                    text-blue-400
-                  "
-                >
+infiniteFeatures.map(
 
-                  {f.title}
+(f,i)=>(
 
-                </h2>
+<div
 
-                <p
-                  className="
-                    text-gray-400
-                    text-sm
+key={i}
 
-                    leading-relaxed
-                  "
-                >
+className="
+min-w-[260px]
 
-                  {f.desc}
+bg-slate-800/70
 
-                </p>
+backdrop-blur-sm
 
-              </div>
-            ))}
+p-6
 
-        </div>
+rounded-2xl
 
-      </div>
+border
+border-slate-700
 
-      {/* CTA */}
-      <div
-        className="
-          text-center
+transition-all
+duration-300
 
-          pb-8
+hover:border-blue-400
 
-          relative
-          z-10
-        "
-      >
+hover:shadow-lg
+hover:shadow-blue-500/20
 
-        <h2
-          className="
-            text-2xl
-            font-semibold
+hover:scale-[1.02]
 
-            mb-5
+flex-shrink-0
+"
 
-            transition-all
-            duration-300
+>
 
-            hover:drop-shadow-[0_0_20px_rgba(96,165,250,0.7)]
-          "
-        >
+<h2
 
-          Start your journey today
+className="
+text-lg
+font-semibold
 
-          <img
-            src="/rocket.png"
+mb-2
 
-            className="
-              inline-block
+text-blue-400
+"
 
-              w-7
+>
 
-              ml-2
+{f.title}
 
-              animate-bounce
-            "
-          />
+</h2>
 
-        </h2>
+<p
 
-        <button
-          onClick={() =>
-            navigate("/login")
-          }
+className="
+text-gray-400
+text-sm
+"
 
-          className="
-            group
-            relative
+>
 
-            px-8 py-3
+{f.desc}
 
-            rounded-lg
+</p>
 
-            bg-blue-600
+</div>
 
-            transition-all
-            duration-300
+)
 
-            hover:scale-105
-          "
-        >
+)
 
-          <span
-            className="
-              absolute inset-0
+}
 
-              rounded-lg
+</div>
 
-              bg-green-400
+</div>
 
-              opacity-0
 
-              group-hover:opacity-20
+{/* CTA */}
 
-              blur-xl
+<div
 
-              transition
-            "
-          ></span>
+className="
+text-center
 
-          <span
-            className="
-              relative z-10
-            "
-          >
+pb-8
 
-            Get Started
+relative
+z-10
+"
 
-          </span>
+>
 
-        </button>
+<h2
 
-      </div>
+className="
+text-2xl
+font-semibold
+mb-5
+"
 
-    </div>
-  );
+>
+
+Start your journey today
+
+</h2>
+
+<button
+
+onClick={()=>
+navigate("/login")
+}
+
+className="
+px-8 py-3
+
+rounded-lg
+
+bg-blue-600
+
+transition-transform
+duration-300
+
+hover:scale-[1.03]
+
+hover:shadow-lg
+hover:shadow-blue-500/20
+"
+
+>
+
+Get Started
+
+</button>
+
+</div>
+
+</div>
+
+);
+
 }

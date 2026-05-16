@@ -1,34 +1,121 @@
 import express from "express";
+
 import cors from "cors";
 
-import authRoutes from "./routes/auth.js";
-import leaderboardRoutes from "./routes/leaderboard.js";
+import helmet from "helmet";
+
+import rateLimit from "express-rate-limit";
+
+import morgan from "morgan";
+
+import authRoutes from "./routes/authRoutes.js";
+
+import leaderboardRoutes from "./routes/leaderboardRoutes.js";
 
 import errorMiddleware from "./middleware/errorMiddleware.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+import quizRoutes from "./routes/quizRoutes.js";
+import prepPlannerRoutes from "./routes/prepPlannerRoutes.js";
+import compilerRoutes
+from "./routes/compilerRoutes.js";
 
 const app = express();
 
-// Middleware
+// ================= SECURITY =================
+app.use(helmet());
+
+// ================= RATE LIMIT =================
+const limiter = rateLimit({
+  windowMs:
+    15 * 60 * 1000,
+
+  max: 100,
+
+  message: {
+    success: false,
+    msg:
+      "Too many requests, please try again later.",
+  },
+});
+
+app.use(limiter);
+
+// ================= MIDDLEWARE =================
 app.use(express.json());
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+    ],
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+
     credentials: true,
   })
 );
 
-// Routes
-app.use("/api/auth", authRoutes);
 
-app.use("/api/leaderboard", leaderboardRoutes);
 
-// Health route
+// ================= LOGGER =================
+if (
+  process.env.NODE_ENV ===
+  "development"
+) {
+
+  app.use(morgan("dev"));
+
+}
+
+// ================= ROUTES =================
+app.use(
+  "/api/auth",
+  authRoutes
+);
+
+app.use(
+  "/api/leaderboard",
+  leaderboardRoutes
+);
+
+app.use(
+  "/api/reviews",
+  reviewRoutes
+);
+
+app.use("/api/quiz", quizRoutes);
+
+app.use(
+  "/api/prep-planner",
+  prepPlannerRoutes
+);
+
+app.use(
+"/api/compiler",
+compilerRoutes
+);
+// ================= HEALTH =================
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+
+  res.send(
+    "Backend is running 🚀"
+  );
+
 });
 
-// Global Error Middleware
+// ================= ERROR =================
 app.use(errorMiddleware);
 
 export default app;

@@ -91,8 +91,8 @@ export default function Navbar() {
           >
 
             <img
-              src="/companyLogo.png"
-              alt="LearnEdge"
+              src="/rocket.png"
+              alt="PingoAI"
               className="
                 w-10 h-10 rounded-full
                 shadow-[0_0_15px_rgba(59,130,246,0.5)]
@@ -105,7 +105,7 @@ export default function Navbar() {
                 font-bold tracking-wide
               "
             >
-              LearnEdge
+              PingoAI
             </h1>
 
           </div>
