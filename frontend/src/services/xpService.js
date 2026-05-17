@@ -1,20 +1,23 @@
 import api from "../api/axios";
 
 export const updateXP =
-  async (
-    xp,
-    level
-  ) => {
+async(
+  xp,
+  level
+)=>{
 
-    const res =
-      await api.patch(
-        "/leaderboard/xp",
+const res =
+await api.patch(
 
-        {
-          xp,
-          level,
-        }
-      );
+"/api/leaderboard/xp",
 
-    return res.data;
+{
+xp,
+level
+}
+
+);
+
+return res.data;
+
 };

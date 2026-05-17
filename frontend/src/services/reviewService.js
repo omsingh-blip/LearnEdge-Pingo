@@ -1,27 +1,46 @@
 export const reviewCode =
-  async ({
-    question_name,
-    student_id,
-    student_solution,
-  }) => {
+async({
+  question_name,
+  student_id,
+  student_solution,
+})=>{
 
-    const response = await fetch(
-      `${import.meta.env.VITE_AI_REVIEW_API}/review-code`,
-      {
-        method: "POST",
+const response =
+await fetch(
 
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
+`${import.meta.env.VITE_API_URL}/api/reviews/review-code`,
 
-        body: JSON.stringify({
-          question_name,
-          student_id,
-          student_solution,
-        }),
-      }
-    );
+{
+method:"POST",
 
-    return response.json();
-  };
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+question_name,
+student_id,
+student_solution
+})
+
+}
+
+);
+
+const data =
+await response.json();
+
+if(!response.ok){
+
+throw new Error(
+data.message ||
+"Review failed"
+);
+
+}
+
+return data;
+
+};

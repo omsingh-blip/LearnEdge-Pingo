@@ -7,9 +7,10 @@ export const initSocket = (server) => {
   io = new Server(server, {
 
     cors: {
+
       origin: [
         "http://localhost:5173",
-        "https://pingo-ai.netlify.app"
+        process.env.FRONTEND_URL
       ],
 
       methods: [
@@ -18,6 +19,7 @@ export const initSocket = (server) => {
       ],
 
       credentials: true
+
     }
 
   });
@@ -31,7 +33,7 @@ export const initSocket = (server) => {
 
     socket.on(
       "disconnect",
-      () => {
+      ()=>{
 
         console.log(
           "User disconnected:",

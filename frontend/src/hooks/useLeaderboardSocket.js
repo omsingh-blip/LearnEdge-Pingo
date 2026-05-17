@@ -1,20 +1,38 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 
-export default function useLeaderboardSocket(setLeaders) {
+export default function useLeaderboardSocket(
+  setLeaders
+){
 
-  useEffect(() => {
+useEffect(()=>{
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL);
+const socket = io(
 
-    socket.on("leaderboardUpdate", (data) => {
-      setLeaders(data);
-    });
+import.meta.env.VITE_API_URL,
 
-    return () => {
-      socket.disconnect();
-    };
+{
+withCredentials:true,
+transports:["websocket"]
+}
 
-  }, [setLeaders]);
+);
+
+socket.on(
+"leaderboardUpdate",
+(data)=>{
+
+setLeaders(data);
+
+}
+);
+
+return ()=>{
+
+socket.disconnect();
+
+};
+
+},[setLeaders]);
 
 }

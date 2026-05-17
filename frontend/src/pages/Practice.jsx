@@ -9,156 +9,165 @@ import Button from "../components/ui/Button";
 
 export default function Practice() {
 
-  const location =
-    useLocation();
+const API =
+import.meta.env.VITE_API_URL;
 
-  const [language, setLanguage] =
-    useState("javascript");
+const location =
+useLocation();
 
-  const [code, setCode] =
-    useState(
-      `console.log("Hello LearnEdge");`
-    );
+const [language,setLanguage] =
+useState("javascript");
 
+const [code,setCode] =
+useState(
+`console.log("Hello LearnEdge");`
+);
 
-  const [loading, setLoading] =
-    useState(false);
+const [loading,setLoading] =
+useState(false);
 
-  const [review, setReview] =
-    useState(null);
+const [review,setReview] =
+useState(null);
 
-  const question =
-    location.state?.question;
+const question =
+location.state?.question;
 
-  const [problem, setProblem] =
-    useState(
-      question?.title || ""
-    );
+const [problem,setProblem] =
+useState(
+question?.title || ""
+);
 
-  const [showQuestionInfo,
-    setShowQuestionInfo] =
-    useState(
-      !!question
-    );
+const [showQuestionInfo,
+setShowQuestionInfo] =
+useState(
+!!question
+);
 
-  const [output, setOutput] =
-    useState("");
+const [output,setOutput] =
+useState("");
 
-  const [running, setRunning] =
-    useState(false);
-
-
-  useEffect(() => {
-
-    if (question) {
-
-      setProblem(
-        question.title
-      );
-
-      setShowQuestionInfo(
-        true
-      );
-
-      setReview(
-        null
-      );
-
-    }
-
-  }, [question]);
-  // ================= REVIEW =================
-
-  const handleReview =
-    async () => {
-
-      if (!code.trim())
-        return;
-
-      try {
-
-        setLoading(true);
-
-        setShowQuestionInfo(false);
-
-        const token =
-          localStorage.getItem(
-            "token"
-          );
-
-        const res =
-          await fetch(
-            "http://localhost:5000/api/reviews",
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-
-                Authorization:
-                  `Bearer ${token}`
-              },
-
-              body:
-                JSON.stringify({
-
-                  problem,
-                  language,
-                  code
-
-                })
-            }
-          );
-
-        const data =
-          await res.json();
-
-        if (
-          !data.success
-        ) {
-
-          throw new Error(
-            data.message
-          );
-
-        }
-
-        setReview(
-          data.review
-        );
-
-      }
-
-      catch (error) {
-
-        console.log(
-          error
-        );
-
-        setOutput(
-          "❌ Review Failed"
-        );
-
-        setShowQuestionInfo(
-          true
-        );
-      }
-
-      finally {
-
-        setLoading(
-          false
-        );
-
-      }
-
-    };
+const [running,setRunning] =
+useState(false);
 
 
-  // ================= RUN =================
+useEffect(()=>{
 
-const handleRunCode=
+if(question){
+
+setProblem(
+question.title
+);
+
+setShowQuestionInfo(
+true
+);
+
+setReview(
+null
+);
+
+}
+
+},[question]);
+
+
+// ================= REVIEW =================
+
+const handleReview =
+async()=>{
+
+if(!code.trim())
+return;
+
+try{
+
+setLoading(true);
+
+setShowQuestionInfo(false);
+
+const token =
+localStorage.getItem(
+"token"
+);
+
+const res =
+await fetch(
+
+`${API}/api/reviews`,
+
+{
+method:"POST",
+
+headers:{
+
+"Content-Type":
+"application/json",
+
+Authorization:
+`Bearer ${token}`
+
+},
+
+body:
+JSON.stringify({
+
+problem,
+language,
+code
+
+})
+
+}
+
+);
+
+const data =
+await res.json();
+
+if(!data.success){
+
+throw new Error(
+data.message
+);
+
+}
+
+setReview(
+data.review
+);
+
+}
+
+catch(error){
+
+console.log(
+error
+);
+
+setOutput(
+"❌ Review Failed"
+);
+
+setShowQuestionInfo(
+true
+);
+
+}
+
+finally{
+
+setLoading(
+false
+);
+
+}
+
+};
+
+
+// ================= RUN =================
+
+const handleRunCode =
 async()=>{
 
 try{
@@ -169,13 +178,12 @@ setOutput(
 "Running..."
 );
 
-const res=
+const res =
 await fetch(
 
-"http://localhost:5000/api/compiler/run",
+`${API}/api/compiler/run`,
 
 {
-
 method:"POST",
 
 headers:{
@@ -197,16 +205,19 @@ language
 
 );
 
-const data=
+const data =
 await res.json();
 
 setOutput(
-data.output
+data.output ||
+"Completed"
 );
 
 }
 
-catch{
+catch(error){
+
+console.log(error);
 
 setOutput(
 "❌ Execution failed"
@@ -222,132 +233,127 @@ setRunning(false);
 
 };
 
-  const renderList =
-    (title, items) => {
 
-      if (
-        !items ||
-        !items.length
-      )
-        return null;
+// ================= LIST RENDER =================
 
-      return (
+const renderList =
+(title,items)=>{
 
-        <div>
+if(
+!items ||
+!items.length
+)
+return null;
 
-          <p
-            className="
+return(
+
+<div>
+
+<p
+className="
 text-gray-400
 mb-2
 "
-          >
+>
 
-            {title}
+{title}
 
-          </p>
+</p>
 
-          <div
-            className="
+<div
+className="
 p-4
 rounded-xl
-
 bg-slate-800
-
 border
 border-slate-700
 "
-          >
+>
 
-            <ul
-              className="
+<ul
+className="
 list-disc
 ml-5
 space-y-2
 "
-            >
+>
 
-              {
+{
+items.map(
+(item,i)=>(
 
-                items.map(
-                  (item, i) => (
+<li key={i}>
+{item}
+</li>
 
-                    <li
-                      key={i}
-                    >
+)
+)
+}
 
-                      {item}
+</ul>
 
-                    </li>
+</div>
 
-                  )
-                )
+</div>
 
-              }
+);
 
-            </ul>
+};
 
-          </div>
 
-        </div>
+return(
 
-      );
+<DashboardLayout>
 
-    };
-
-  return (
-
-    <DashboardLayout>
-
-      <div
-        className="
+<div
+className="
 max-w-7xl
 mx-auto
 
 grid
 grid-cols-1
 lg:grid-cols-2
-
 gap-6
 "
-      >
+>
 
-        {/* LEFT */}
+{/* LEFT */}
 
-        <Card
-          className="
+<Card
+className="
 p-5
 bg-slate-900/60
 backdrop-blur-xl
 "
-        >
+>
 
-          <h1
-            className="
+<h1
+className="
 text-2xl
 font-bold
 mb-5
 "
-          >
+>
 
-            Coding Practice
+Coding Practice
 
-          </h1>
+</h1>
 
-          <input
 
-            value={problem}
+<input
 
-            onChange={
-              (e) =>
-                setProblem(
-                  e.target.value
-                )
-            }
+value={problem}
 
-            placeholder=
-            "Problem title..."
+onChange={(e)=>
+setProblem(
+e.target.value
+)
+}
 
-            className="
+placeholder=
+"Problem title..."
+
+className="
 w-full
 mb-4
 p-3
@@ -359,114 +365,116 @@ bg-slate-800
 border
 border-slate-700
 "
-          />
+/>
 
-          <select
-            value={language}
-            onChange={(e) =>
-              setLanguage(
-                e.target.value
-              )
-            }
 
-            className="
-    mb-4
-    p-2
+<select
 
-    rounded-xl
+value={language}
 
-    bg-slate-800
+onChange={(e)=>
+setLanguage(
+e.target.value
+)
+}
 
-    border
-    border-slate-700
-  "
-          >
+className="
+mb-4
+p-2
 
-            <option value="javascript">
-              JavaScript
-            </option>
+rounded-xl
 
-            <option value="python">
-              Python
-            </option>
+bg-slate-800
 
-            <option value="cpp">
-              C++
-            </option>
+border
+border-slate-700
+"
+>
 
-            <option value="java">
-              Java
-            </option>
+<option value="javascript">
+JavaScript
+</option>
 
-          </select>
+<option value="python">
+Python
+</option>
 
-          <Editor
+<option value="cpp">
+C++
+</option>
 
-            height="500px"
+<option value="java">
+Java
+</option>
 
-            theme="vs-dark"
+</select>
 
-            language={language}
 
-            value={code}
+<Editor
 
-            onChange={
-              (v) =>
-                setCode(
-                  v || ""
-                )
-            }
+height="500px"
 
-          />
+theme="vs-dark"
 
-          <div
-            className="
+language={language}
+
+value={code}
+
+onChange={(v)=>
+setCode(
+v || ""
+)
+}
+
+/>
+
+
+<div
+className="
 mt-5
 flex
 gap-4
 "
-          >
+>
 
-            <Button
-              onClick={
-                handleRunCode
-              }
-            >
+<Button
+onClick={
+handleRunCode
+}
+>
 
-              {running ?
+{
+running
+?
+"Running..."
+:
+"Run Code"
+}
 
-                "Running..."
+</Button>
 
-                :
 
-                "Run Code"
+<Button
+onClick={
+handleReview
+}
+>
 
-              }
+{
+loading
+?
+"Reviewing..."
+:
+"Review Code"
+}
 
-            </Button>
+</Button>
 
-            <Button
-              onClick={
-                handleReview
-              }
-            >
+</div>
 
-              {loading ?
 
-                "Reviewing..."
-
-                :
-
-                "Review Code"
-
-              }
-
-            </Button>
-
-          </div>
-
-          <div
-            className="
+<div
+className="
 mt-5
 p-4
 
@@ -481,310 +489,248 @@ text-green-400
 
 font-mono
 "
-          >
+>
 
-            {
-              output ||
+{
+output ||
+"Run your code..."
+}
 
-              "Run your code..."
-            }
+</div>
 
-          </div>
-
-        </Card>
+</Card>
 
 
-        {/* RIGHT PANEL */}
+{/* RIGHT */}
 
-        <Card
-          className="
+<Card
+className="
 p-5
 bg-slate-900/60
 backdrop-blur-xl
 min-h-[700px]
 "
-        >
+>
 
-          {
+{
+showQuestionInfo &&
+question
 
-            showQuestionInfo &&
-              question
+?
 
-              ?
+(
 
-              (
+<div>
 
-                <div>
-
-                  <h2
-                    className="
+<h2
+className="
 text-2xl
 font-bold
 mb-5
 text-cyan-400
 "
-                  >
+>
 
-                    📝 Problem Details
+📝 Problem Details
 
-                  </h2>
+</h2>
 
-
-                  <div
-                    className="
+<div
+className="
 space-y-5
 "
-                  >
+>
 
-                    <div>
+<div>
 
-                      <p
-                        className="
+<p
+className="
 text-sm
 text-gray-400
 mb-2
 "
-                      >
+>
 
-                        Description
+Description
 
-                      </p>
+</p>
 
-                      <div
-                        className="
+<div
+className="
 p-4
-
 rounded-xl
-
 bg-slate-800
-
 border
 border-slate-700
 "
-                      >
+>
 
-                        {question.description}
+{question.description}
 
-                      </div>
+</div>
 
-                    </div>
+</div>
 
+<div>
 
-                    <div>
-
-                      <p
-                        className="
+<p
+className="
 text-sm
 text-gray-400
 mb-2
 "
-                      >
+>
 
-                        Example
+Example
 
-                      </p>
+</p>
 
-                      <pre
-                        className="
+<pre
+className="
 p-4
-
 rounded-xl
-
 bg-black/40
-
 border
 border-slate-700
-
 text-green-300
-
 whitespace-pre-wrap
 overflow-auto
 "
-                      >
+>
 
-                        {question.example}
+{question.example}
 
-                      </pre>
+</pre>
 
-                    </div>
+</div>
 
+</div>
 
-                    <div
-                      className="
-flex gap-3
-"
-                    >
+</div>
 
-                      <span
-                        className="
-px-3 py-1
+)
 
-rounded-xl
+:
 
-bg-blue-500/20
-"
-                      >
+(
 
-                        {question.topic}
+<div>
 
-                      </span>
-
-                      <span
-                        className="
-px-3 py-1
-
-rounded-xl
-
-bg-yellow-500/20
-"
-                      >
-
-                        {question.difficulty}
-
-                      </span>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              )
-
-              :
-
-              (
-
-                <div>
-
-                  <h2
-                    className="
+<h2
+className="
 text-2xl
 font-bold
 mb-5
 "
-                  >
+>
 
-                    🧠 AI Review
+🧠 AI Review
 
-                  </h2>
+</h2>
 
-                  {
+{
+!review
 
-                    !review ?
+?
 
-                      (
-
-                        <div
-                          className="
+<div
+className="
 text-gray-500
 "
-                        >
+>
 
-                          Submit code for AI review 🚀
+Submit code for AI review 🚀
 
-                        </div>
+</div>
 
-                      )
+:
 
-                      :
-
-                      (
-
-                        <div
-                          className="
+<div
+className="
 space-y-5
 "
-                        >
+>
 
-                          <div>
+<div>
 
-                            <span
-                              className="
+<span
+className="
 px-4 py-2
-
 rounded-xl
-
 bg-blue-500/20
 "
-                            >
+>
 
-                              {review.status}
+{review.status}
 
-                            </span>
+</span>
 
-                          </div>
+</div>
 
-                          <div
-                            className="
+<div
+className="
 p-4
-
 rounded-xl
-
 bg-slate-800
 "
-                          >
+>
 
-                            {review.feedback.summary}
+{review.feedback.summary}
 
-                          </div>
+</div>
 
-                          {renderList(
-                            "❌ Bugs",
-                            review.feedback.bugs
-                          )}
+{renderList(
+"❌ Bugs",
+review.feedback.bugs
+)}
 
-                          {renderList(
-                            "⚡ Optimization",
-                            review.feedback.optimization
-                          )}
+{renderList(
+"⚡ Optimization",
+review.feedback.optimization
+)}
 
-                          {renderList(
-                            "📖 Readability",
-                            review.feedback.readability
-                          )}
+{renderList(
+"📖 Readability",
+review.feedback.readability
+)}
 
-                          {renderList(
-                            "🚀 Best Practices",
-                            review.feedback.bestPractices
-                          )}
+{renderList(
+"🚀 Best Practices",
+review.feedback.bestPractices
+)}
 
-                          <div
-                            className="
+<div
+className="
 p-5
-
 rounded-xl
-
 bg-yellow-500/10
-
-border border-yellow-500/30
-
+border
+border-yellow-500/30
 text-yellow-300
 font-bold
 "
-                          >
+>
 
-                            +{review.earnedXp} XP ⚡
++{review.earnedXp} XP ⚡
 
-                          </div>
+</div>
 
-                        </div>
+</div>
 
-                      )
+}
 
-                  }
+</div>
 
-                </div>
+)
 
-              )
+}
 
-          }
+</Card>
 
-        </Card>
-      </div>
+</div>
 
-    </DashboardLayout>
+</DashboardLayout>
 
-  );
+);
 
 }

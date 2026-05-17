@@ -3,32 +3,48 @@ const API =
   "http://localhost:5000";
 
 const getToken = () =>
-  localStorage.getItem(
-    "token"
-  );
+  localStorage.getItem("token");
+
+
+// ================= HELPER =================
+
+const request = async (
+  url,
+  options = {}
+) => {
+
+  const res =
+    await fetch(
+      `${API}${url}`,
+      options
+    );
+
+  const data =
+    await res.json();
+
+  if(!res.ok){
+
+    throw new Error(
+      data.message ||
+      "Request failed"
+    );
+
+  }
+
+  return data;
+
+};
+
 
 // ================= GET DOMAIN =================
 
 export const fetchQuizByDomain =
 async(domain)=>{
 
-const res=
-await fetch(
-
-`${API}/quiz/${domain}`
-
+const data =
+await request(
+`/api/quiz/${domain}`
 );
-
-const data=
-await res.json();
-
-if(!data.success){
-
-throw new Error(
-data.message
-);
-
-}
 
 return data.quiz;
 
@@ -40,26 +56,19 @@ return data.quiz;
 export const getAllQuizzes =
 async()=>{
 
-const res=
-await fetch(
+const data =
+await request(
 
-`${API}/quiz`,
+"/api/quiz",
 
 {
-
 headers:{
-
 Authorization:
 `Bearer ${getToken()}`
-
 }
-
 }
 
 );
-
-const data=
-await res.json();
 
 return data.quizzes;
 
@@ -71,13 +80,11 @@ return data.quizzes;
 export const createQuiz =
 async(payload)=>{
 
-const res=
-await fetch(
+return await request(
 
-`${API}/quiz`,
+"/api/quiz",
 
 {
-
 method:"POST",
 
 headers:{
@@ -87,7 +94,6 @@ headers:{
 
 Authorization:
 `Bearer ${getToken()}`
-
 },
 
 body:
@@ -99,26 +105,19 @@ payload
 
 );
 
-return await res.json();
-
 };
 
 
 // ================= UPDATE =================
 
 export const updateQuiz =
-async(
-id,
-payload
-)=>{
+async(id,payload)=>{
 
-const res=
-await fetch(
+return await request(
 
-`${API}/quiz/${id}`,
+`/api/quiz/${id}`,
 
 {
-
 method:"PATCH",
 
 headers:{
@@ -128,7 +127,6 @@ headers:{
 
 Authorization:
 `Bearer ${getToken()}`
-
 },
 
 body:
@@ -140,8 +138,6 @@ payload
 
 );
 
-return await res.json();
-
 };
 
 
@@ -150,25 +146,19 @@ return await res.json();
 export const deleteQuiz =
 async(id)=>{
 
-const res=
-await fetch(
+return await request(
 
-`${API}/quiz/${id}`,
+`/api/quiz/${id}`,
 
 {
-
 method:"DELETE",
 
 headers:{
-
 Authorization:
 `Bearer ${getToken()}`
 }
-
 }
 
 );
-
-return await res.json();
 
 };
