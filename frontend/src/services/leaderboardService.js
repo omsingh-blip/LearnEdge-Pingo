@@ -1,26 +1,25 @@
 import api from "../api/axios";
 
 // GET LEADERBOARD
-export const getLeaderboard =
-  async () => {
+export const getLeaderboard = async () => {
 
-    const res = await api.get(
-      "/leaderboard"
-    );
+  const res = await api.get(
+    "/api/leaderboard"
+  );
 
-    return res.data;
-  };
+  return res.data;
+};
+
 
 // UPDATE SCORE
-export const updateScore =
-  async (points) => {
+export const updateScore = async (points) => {
 
-    const res = await api.post(
-      "/leaderboard/update-score",
-      {
-        points,
-      }
-    );
+  const res = await api.post(
+    "/api/leaderboard/update-score",
+    {
+      points
+    }
+  );
 
-    return res.data;
-  };
+  return res.data;
+};
