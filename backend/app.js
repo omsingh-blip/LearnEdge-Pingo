@@ -41,10 +41,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // ================= MIDDLEWARE =================
-app.use(express.json());
 
-app.use(
- app.use(express.json());
+app.use(express.json());
 
 app.use(
   cors({
@@ -56,9 +54,11 @@ app.use(
       "GET",
       "POST",
       "PUT",
-      "DELETE"
+      "DELETE",
+      "PATCH",
+      "OPTIONS"
     ],
-    credentials: true
+    credentials: true,
   })
 );
 
