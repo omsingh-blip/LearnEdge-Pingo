@@ -7,7 +7,7 @@ export const loginUser = async (
 ) => {
 
   const res = await api.post(
-    "/auth/login",
+    "/api/auth/login",
     {
       email,
       password,
@@ -17,6 +17,7 @@ export const loginUser = async (
   return res.data;
 };
 
+
 // SIGNUP
 export const signupUser = async (
   name,
@@ -25,7 +26,7 @@ export const signupUser = async (
 ) => {
 
   const res = await api.post(
-    "/auth/register",
+    "/api/auth/register",
     {
       name,
       email,
@@ -36,13 +37,16 @@ export const signupUser = async (
   return res.data;
 };
 
+
 // GET CURRENT USER
 export const getCurrentUser =
-  async () => {
+async()=>{
 
-    const res = await api.get(
-      "/auth/me"
-    );
+const res =
+await api.get(
+"/api/auth/me"
+);
 
-    return res.data;
-  };
+return res.data;
+
+};
