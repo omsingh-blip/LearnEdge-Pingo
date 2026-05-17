@@ -367,10 +367,11 @@ loading
 <div
 className="
 mt-10
-grid
-gap-6
+space-y-6
 "
 >
+
+{/* Title */}
 
 <div
 className="
@@ -390,13 +391,106 @@ text-blue-400
 "
 >
 
-{
-result.study_plan_title
-}
+{result.study_plan_title}
 
 </h2>
 
 </div>
+
+
+{/* Summary */}
+
+{result.summary && (
+
+<div
+className="
+bg-slate-800/80
+p-5
+rounded-xl
+border
+border-slate-700
+"
+>
+
+<h3
+className="
+font-semibold
+text-lg
+mb-3
+text-cyan-400
+"
+>
+
+📌 Summary
+
+</h3>
+
+<p>
+
+{result.summary}
+
+</p>
+
+</div>
+
+)}
+
+
+{/* Timeline / Tasks */}
+
+{result.plan?.map((item,index)=>(
+
+<div
+
+key={index}
+
+className="
+bg-slate-800/80
+p-5
+rounded-xl
+border
+border-slate-700
+"
+
+>
+
+<h3
+className="
+font-bold
+text-lg
+text-yellow-400
+mb-3
+"
+>
+
+⏰ {item.time}
+
+</h3>
+
+<p
+className="
+font-semibold
+mb-2
+"
+>
+
+{item.task}
+
+</p>
+
+<p
+className="
+text-gray-400
+"
+>
+
+{item.description}
+
+</p>
+
+</div>
+
+))}
 
 </div>
 
