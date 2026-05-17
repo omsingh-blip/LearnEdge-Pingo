@@ -398,47 +398,30 @@ text-blue-400
 </div>
 
 
-{/* Summary */}
-
-{result.summary && (
+{/* Daily Schedule */}
 
 <div
 className="
-bg-slate-800/80
-p-5
-rounded-xl
-border
-border-slate-700
+space-y-4
 "
 >
 
 <h3
 className="
-font-semibold
-text-lg
-mb-3
+text-xl
+font-bold
 text-cyan-400
 "
 >
 
-📌 Summary
+📅 Daily Schedule
 
 </h3>
 
-<p>
+{
 
-{result.summary}
-
-</p>
-
-</div>
-
-)}
-
-
-{/* Timeline / Tasks */}
-
-{result.plan?.map((item,index)=>(
+result.daily_schedule?.map(
+(item,index)=>(
 
 <div
 
@@ -454,18 +437,17 @@ border-slate-700
 
 >
 
-<h3
+<p
 className="
-font-bold
-text-lg
 text-yellow-400
-mb-3
+font-bold
+mb-2
 "
 >
 
-⏰ {item.time}
+⏰ {item.time_block}
 
-</h3>
+</p>
 
 <p
 className="
@@ -474,23 +456,136 @@ mb-2
 "
 >
 
-{item.task}
+📚 {item.topic}
 
 </p>
 
 <p
 className="
-text-gray-400
+text-gray-300
+mb-2
 "
 >
 
-{item.description}
+✅ {item.tasks}
+
+</p>
+
+<p
+className="
+text-blue-300
+"
+>
+
+🎯 Focus:
+{" "}
+{item.focus}
 
 </p>
 
 </div>
 
-))}
+)
+
+)
+
+}
+
+</div>
+
+
+{/* Important Questions */}
+
+{
+
+result.important_questions?.length>0 && (
+
+<div
+className="
+bg-slate-800/80
+p-5
+rounded-xl
+border
+border-slate-700
+"
+>
+
+<h3
+className="
+font-bold
+text-xl
+mb-4
+text-purple-400
+"
+>
+
+❓ Important Questions
+
+</h3>
+
+<ul
+className="
+list-disc
+ml-5
+space-y-2
+"
+>
+
+{
+
+result.important_questions.map(
+(q,i)=>(
+
+<li key={i}>
+{q}
+</li>
+
+)
+)
+
+}
+
+</ul>
+
+</div>
+
+)
+
+}
+
+
+{/* Tips */}
+
+<div
+className="
+bg-slate-800/80
+p-5
+rounded-xl
+border
+border-slate-700
+"
+>
+
+<h3
+className="
+font-bold
+text-xl
+mb-3
+text-green-400
+"
+>
+
+💡 Tips
+
+</h3>
+
+<p>
+
+{result.tips}
+
+</p>
+
+</div>
 
 </div>
 
