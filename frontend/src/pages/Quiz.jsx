@@ -13,6 +13,8 @@ import {
   useQuizStore,
 } from "../store/useQuizStore";
 
+const API =
+  import.meta.env.VITE_API_URL;
 export default function Quiz() {
 
   const navigate =
@@ -60,7 +62,7 @@ export default function Quiz() {
 
     fetchQuiz(domain);
 
-  }, [domain]);
+  }, [domain, fetchQuiz]);
 
   // ================= TIMER =================
   useEffect(() => {
@@ -97,74 +99,140 @@ export default function Quiz() {
     correct * 5;
 
   // ================= BACKEND SCORE =================
+
   const updateScoreBackend =
     async (points) => {
 
       try {
 
         const token =
-          localStorage.getItem("token");
+          localStorage.getItem(
+            "token"
+          );
 
-        await fetch(
-          "https://learnedge-backend-raxx.onrender.com/api/leaderboard/update-score",
-          {
-            method: "POST",
+        const res =
+          await fetch(
 
-            headers: {
-              "Content-Type":
-                "application/json",
+            `${API}/api/leaderboard/update-score`,
 
-              Authorization: token,
-            },
+            {
+              method: "POST",
 
-            body: JSON.stringify({
-              points,
-            }),
-          }
-        );
+              headers: {
 
-      } catch (err) {
+                "Content-Type":
+                  "application/json",
+
+                Authorization:
+                  `Bearer ${token}`
+
+              },
+
+              body:
+                JSON.stringify({
+                  points
+                })
+
+            }
+
+          );
+
+        const data =
+          await res.json();
+
+        if (!res.ok) {
+
+          throw new Error(
+            data.message ||
+            "Score sync failed"
+          );
+
+        }
+
+        return data;
+
+      }
+      catch (err) {
 
         console.error(
           "Score sync failed:",
           err
         );
+
       }
+
     };
 
   // ================= XP UPDATE =================
+
   useEffect(() => {
 
     if (
-      showResult &&
-      questions.length > 0 &&
-      !xpGiven
+      !showResult ||
+      questions.length === 0 ||
+      xpGiven
     ) {
-
-      addXP(earnedXP);
-
-      if (
-        Math.floor(xp / 100) <
-        Math.floor(
-          (xp + earnedXP) / 100
-        )
-      ) {
-
-        setLevelUp(true);
-
-        setTimeout(() => {
-
-          setLevelUp(false);
-
-        }, 3000);
-      }
-
-      updateScoreBackend(earnedXP);
-
-      setXpGiven(true);
+      return;
     }
 
-  }, [showResult]);
+    let timeoutId;
+
+    const syncScore =
+      async () => {
+
+        // prevent duplicate calls immediately
+        setXpGiven(true);
+
+        // add earned XP
+        addXP(
+          earnedXP
+        );
+
+        // level-up animation
+        if (
+          Math.floor(xp / 100)
+          <
+          Math.floor(
+            (xp + earnedXP) / 100
+          )
+        ) {
+
+          setLevelUp(true);
+
+          timeoutId =
+            setTimeout(() => {
+
+              setLevelUp(false);
+
+            }, 3000);
+
+        }
+
+        // sync score to backend
+        await updateScoreBackend(
+          earnedXP
+        );
+
+      };
+
+    syncScore();
+
+    return () => {
+
+      clearTimeout(
+        timeoutId
+      );
+
+    };
+
+  }, [
+    showResult,
+    questions.length,
+    xpGiven,
+    earnedXP,
+    xp
+  ]);
+
 
   // ================= ANSWER =================
   const handleAnswer =
@@ -459,10 +527,9 @@ export default function Quiz() {
 
               style={{
                 width:
-                  `${(
-                    (current + 1) /
-                    questions.length
-                  ) * 100}%`,
+                  `${questions.length
+                    ? ((current + 1) / questions.length) * 100
+                    : 0}%`,
               }}
             />
 
@@ -519,10 +586,9 @@ export default function Quiz() {
                   transition-all
                   duration-300
 
-                  ${
-                    answers[current] === opt
+                  ${answers[current] === opt
 
-                      ? `
+                    ? `
                         bg-blue-500
                         border-blue-300
 
@@ -531,7 +597,7 @@ export default function Quiz() {
                         scale-[1.02]
                       `
 
-                      : `
+                    : `
                         bg-slate-800
                         border-slate-700
 
@@ -571,10 +637,10 @@ export default function Quiz() {
 
             const random =
               hints[
-                Math.floor(
-                  Math.random() *
-                  hints.length
-                )
+              Math.floor(
+                Math.random() *
+                hints.length
+              )
               ];
 
             setShowHint(random);
@@ -640,7 +706,7 @@ export default function Quiz() {
         >
 
           {current ===
-          questions.length - 1
+            questions.length - 1
 
             ? "Finish"
 
