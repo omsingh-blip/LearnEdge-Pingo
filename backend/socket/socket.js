@@ -4,46 +4,88 @@ let io;
 
 export const initSocket = (server) => {
 
-  io = new Server(server, {
+const allowedOrigins=[
 
-    cors: {
+"http://localhost:5173",
 
-      origin: [
-        "http://localhost:5173",
-        process.env.FRONTEND_URL
-      ],
+"https://pingo-ai.netlify.app",
 
-      methods: [
-        "GET",
-        "POST"
-      ],
+"https://pingo-ai-ruddy.vercel.app",
 
-      credentials: true
+process.env.FRONTEND_URL
 
-    }
+];
 
-  });
+io = new Server(server,{
 
-  io.on("connection", (socket) => {
+cors:{
 
-    console.log(
-      "User connected:",
-      socket.id
-    );
+origin:(origin,callback)=>{
 
-    socket.on(
-      "disconnect",
-      ()=>{
+// allow server-side / no-origin requests
 
-        console.log(
-          "User disconnected:",
-          socket.id
-        );
+if(
+!origin ||
+allowedOrigins.includes(
+origin
+)
+){
 
-      }
-    );
+callback(
+null,
+true
+);
 
-  });
+}
+
+else{
+
+callback(
+new Error(
+"Not allowed by CORS"
+)
+);
+
+}
+
+},
+
+methods:[
+
+"GET",
+"POST"
+
+],
+
+credentials:true
+
+}
+
+});
+
+io.on(
+"connection",
+(socket)=>{
+
+console.log(
+"User connected:",
+socket.id
+);
+
+socket.on(
+"disconnect",
+()=>{
+
+console.log(
+"User disconnected:",
+socket.id
+);
+
+}
+);
+
+}
+);
 
 };
 

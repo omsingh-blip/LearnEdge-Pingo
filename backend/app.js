@@ -25,13 +25,45 @@ app.use(helmet());
 
 app.use(express.json());
 
+const allowedOrigins = [
+
+  "http://localhost:5173",
+
+  "https://pingo-ai.netlify.app",
+
+  "https://pingo-ai-ruddy.vercel.app",
+
+  process.env.FRONTEND_URL
+
+];
+
 app.use(
+
   cors({
-    origin: [
-      "http://localhost:5173",
-      process.env.FRONTEND_URL
-    ],
-    methods: [
+
+    origin:(origin,callback)=>{
+
+      // allow Postman/server-side requests
+      if(
+        !origin ||
+        allowedOrigins.includes(origin)
+      ){
+
+        callback(null,true);
+
+      } else {
+
+        callback(
+          new Error(
+            "Not allowed by CORS"
+          )
+        );
+
+      }
+
+    },
+
+    methods:[
       "GET",
       "POST",
       "PUT",
@@ -39,8 +71,11 @@ app.use(
       "DELETE",
       "OPTIONS"
     ],
-    credentials: true
+
+    credentials:true
+
   })
+
 );
 
 
@@ -48,16 +83,16 @@ app.use(
 
 const limiter = rateLimit({
 
-windowMs:
-15 * 60 * 1000,
+  windowMs:
+  15 * 60 * 1000,
 
-max:100,
+  max:100,
 
-message:{
-success:false,
-msg:
-"Too many requests, please try again later."
-}
+  message:{
+    success:false,
+    msg:
+    "Too many requests, please try again later."
+  }
 
 });
 
@@ -67,13 +102,13 @@ app.use(limiter);
 // ================= LOGGER =================
 
 if(
-process.env.NODE_ENV ===
-"development"
+  process.env.NODE_ENV ===
+  "development"
 ){
 
-app.use(
-morgan("dev")
-);
+  app.use(
+    morgan("dev")
+  );
 
 }
 
