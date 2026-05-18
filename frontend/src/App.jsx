@@ -23,6 +23,8 @@ import PageWrapper from "./components/layout/PageWrapper";
 
 import { useAuthStore } from "./store/authStore";
 
+import AuthLoader from "./components/AuthLoader";
+
 // ================= LAZY PAGES =================
 
 const Home = lazy(() =>
@@ -123,13 +125,19 @@ function AnimatedRoutes() {
           />
 
           <Route
-            path="/login"
-            element={
-              <PageWrapper>
-                <Login />
-              </PageWrapper>
-            }
-          />
+  path="/login"
+  element={
+    <AuthLoader>
+
+      <PageWrapper>
+
+        <Login />
+
+      </PageWrapper>
+
+    </AuthLoader>
+  }
+/>
 
           <Route
             path="/prep-planner"
