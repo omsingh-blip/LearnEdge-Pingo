@@ -22,8 +22,6 @@ cors:{
 
 origin:(origin,callback)=>{
 
-// allow server-side / no-origin requests
-
 if(
 !origin ||
 allowedOrigins.includes(
@@ -36,9 +34,7 @@ null,
 true
 );
 
-}
-
-else{
+}else{
 
 callback(
 new Error(
@@ -51,10 +47,8 @@ new Error(
 },
 
 methods:[
-
 "GET",
 "POST"
-
 ],
 
 credentials:true
@@ -86,6 +80,22 @@ socket.id
 
 }
 );
+
+};
+
+
+// ADD THIS
+export const getIO = ()=>{
+
+if(!io){
+
+throw new Error(
+"Socket.io not initialized"
+);
+
+}
+
+return io;
 
 };
 
